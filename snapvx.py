@@ -32,7 +32,7 @@ from scipy.sparse import lil_matrix
 import sys
 import time
 import __builtin__
-
+settings.USE_CVXCANON = False
 # File format: One edge per line, written as "srcID dstID"
 # Commented lines that start with '#' are ignored
 # Returns a TGraphVX object with the designated edges and nodes

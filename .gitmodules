@@ -1,0 +1,6 @@
+[submodule "include/ecos"]
+	path = include/ecos
+	url = https://github.com/embotech/ecos.git
+[submodule "include/CVXcanon"]
+	path = include/CVXcanon
+	url = https://github.com/cvxgrp/CVXcanon.git
