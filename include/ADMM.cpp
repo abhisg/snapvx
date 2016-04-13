@@ -1,6 +1,6 @@
 #include "ADMM.h"
 
-void LoadNodes(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *> > &constraints)
+void ADMM::LoadNodes(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *> > &constraints)
 {
 	for(int i = 0 ; i < objectives.size(); ++i ){
 		LinOp *newobj = new LinOp;
@@ -27,7 +27,7 @@ void LoadNodes(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *
 	}
 }
 
-void LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *> > &constraints)
+void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *> > &constraints)
 {
 	for(int i = 0 ; i < objectives.size(); ++i ){
 		LinOp *newobj = new LinOp;
@@ -55,7 +55,7 @@ void LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< LinOp *
 	}
 }
 
-void ADMM:solve()
+void ADMM::Solve()
 {
 	//TODO : full implementation with convergence
 	for(int iter = 0 ; iter < 10; ++iter){
@@ -76,7 +76,7 @@ void ADMM::ADMM_x(int i){
 
 void ADMM::ADMM_z(int i){
 	//TODO : change the rho of the objective
-	*edge_x_vals[i] = solve(MINIMIZE,edge_objectives[i],edge_constraints[i],solver_options);
+	*edge_z_vals[i] = solve(MINIMIZE,edge_objectives[i],edge_constraints[i],solver_options);
 }
 
 void ADMM::ADMM_u(int i){

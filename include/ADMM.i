@@ -5,7 +5,7 @@
         #include "ADMM.h"
 %}
 
-%include "numpy.i"
+%include "CVXcanon/src/python/numpy.i"
 %include "std_vector.i"
 %include "std_map.i"
 %include "std_string.i"
@@ -17,6 +17,6 @@
 
 namespace std {
    %template(LinOpVector) vector< LinOp * >;
-   %template(LinOpVector2D) vector< LinOp * >;
+   %template(LinOpVector2D) vector<vector< LinOp * > >;
 }
 
