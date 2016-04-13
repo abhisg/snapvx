@@ -83,6 +83,30 @@ void ADMM::ADMM_u(int i){
 	//TODO
 }
 
+std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_node_x_vals()
+{
+	std::vector<std::map<int, Eigen::MatrixXd> > node_x;
+	for ( int i = 0 ; i < node_x_vals.size(); ++i ){
+		node_x.push_back(node_x_vals[i]->primal_values);
+	}
+	return node_x;
+}
 
-	
+std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_edge_z_vals()
+{
+	std::vector<std::map<int, Eigen::MatrixXd> > edge_z;
+	for ( int i = 0 ; i < edge_z_vals.size(); ++i ){
+		edge_z.push_back(edge_z_vals[i]->primal_values);
+	}
+	return edge_z;
+}
+
+std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_edge_u_vals()
+{
+	std::vector<std::map<int, Eigen::MatrixXd> > edge_u;
+	for ( int i = 0 ; i < edge_u_vals.size(); ++i ){
+		edge_u.push_back(edge_u_vals[i]->primal_values);
+	}
+	return edge_u;
+}
 	

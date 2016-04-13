@@ -25,6 +25,9 @@ class ADMM
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void Solve();
+		std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();
+		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_z_vals();
+		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_u_vals();
 };
 
 #endif		

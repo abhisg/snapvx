@@ -3,6 +3,10 @@
 %{
         #define SWIG_FILE_WITH_INIT
         #include "ADMM.h"
+        #include "CVXcanon/src/Solution.hpp"
+        #include "CVXcanon/include/Eigen/Sparse"
+        #include "CVXcanon/include/Eigen/Core"
+        #include <cstdio>
 %}
 
 %include "CVXcanon/src/python/numpy.i"
@@ -11,6 +15,7 @@
 %include "std_string.i"
 %include "ADMM.h"
 
+
 %init %{
         import_array();
 %}
@@ -18,5 +23,7 @@
 namespace std {
    %template(LinOpVector) vector< LinOp * >;
    %template(LinOpVector2D) vector<vector< LinOp * > >;
+   %template(solution) map<int,Eigen::MatrixXd>;
+   %template(solutionVector) vector<map<int,Eigen::MatrixXd> >;
 }
 
