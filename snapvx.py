@@ -23,11 +23,14 @@
 
 from snap import *
 from cvxpy import *
-
+from ADMM import *
+import CVXcanon
+from collections import deque
 import math
 import multiprocessing
 import os
 import numpy
+import scipy
 from scipy.sparse import lil_matrix
 import sys
 import time
@@ -52,7 +55,178 @@ def LoadEdgeList(Filename):
                 nids.add(int(dst))
             gvx.AddEdge(int(src), int(dst))
     return gvx
+type_map = {
+    "VARIABLE": CVXcanon.VARIABLE,
+    "PROMOTE": CVXcanon.PROMOTE,
+    "MUL": CVXcanon.MUL,
+    "RMUL": CVXcanon.RMUL,
+    "MUL_ELEM": CVXcanon.MUL_ELEM,
+    "DIV": CVXcanon.DIV,
+    "SUM": CVXcanon.SUM,
+    "NEG": CVXcanon.NEG,
+    "INDEX": CVXcanon.INDEX,
+    "TRANSPOSE": CVXcanon.TRANSPOSE,
+    "SUM_ENTRIES": CVXcanon.SUM_ENTRIES,
+    "TRACE": CVXcanon.TRACE,
+    "RESHAPE": CVXcanon.RESHAPE,
+    "DIAG_VEC": CVXcanon.DIAG_VEC,
+    "DIAG_MAT": CVXcanon.DIAG_MAT,
+    "UPPER_TRI": CVXcanon.UPPER_TRI,
+    "CONV": CVXcanon.CONV,
+    "HSTACK": CVXcanon.HSTACK,
+    "VSTACK": CVXcanon.VSTACK,
+    "SCALAR_CONST": CVXcanon.SCALAR_CONST,
+    "DENSE_CONST": CVXcanon.DENSE_CONST,
+    "SPARSE_CONST": CVXcanon.SPARSE_CONST,
+    "NO_OP": CVXcanon.NO_OP,
+    "KRON": CVXcanon.KRON,
+}
 
+def set_matrix_data(linC, linPy):
+    '''  Calls the appropriate CVXCanon function to set the matrix data field of our C++ linOp.
+    '''
+    if isinstance(linPy.data, lin_ops.lin_op.LinOp):
+        if linPy.data.type == 'sparse_const':
+            coo = format_matrix(linPy.data.data, 'sparse')
+            linC.set_sparse_data(coo.data, coo.row.astype(float),
+                                 coo.col.astype(float), coo.shape[0], coo.shape[1])
+        elif linPy.data.type == 'dense_const':
+            linC.set_dense_data(format_matrix(linPy.data.data))
+        else:
+            raise NotImplementedError()
+    else:
+        if linPy.type == 'sparse_const':
+            coo = format_matrix(linPy.data, 'sparse')
+            linC.set_sparse_data(coo.data, coo.row.astype(float),
+                                 coo.col.astype(float), coo.shape[0], coo.shape[1])
+        #elif liPy.type == 'scalar_const':
+            
+        else:
+            linC.set_dense_data(format_matrix(linPy.data))
+            
+def format_matrix(matrix, format='dense'):
+    ''' Returns the matrix in the appropriate form,
+        so that it can be efficiently loaded with our swig wrapper
+    '''
+    if (format == 'dense'):
+        # Ensure is 2D.
+        #print matrix
+        matrix = numpy.atleast_2d(matrix)
+        return numpy.asfortranarray(matrix)
+    elif(format == 'sparse'):
+        return scipy.sparse.coo_matrix(matrix)
+    elif(format == 'scalar'):
+        return numpy.asfortranarray(numpy.matrix(matrix))
+    else:
+        raise NotImplementedError()
+
+
+def get_type(ty):
+    if ty in type_map:
+        return type_map[ty]
+    else:
+        raise NotImplementedError()
+
+def build_lin_op_tree(root_linPy, tmp):
+    '''
+    Breadth-first, pre-order traversal on the Python linOp tree
+    Parameters
+    -------------
+    root_linPy: a Python LinOp tree
+
+    tmp: an array to keep data from going out of scope
+
+    Returns
+    --------
+    root_linC: a C++ LinOp tree created through our swig interface
+    '''
+    Q = deque()
+    root_linC = CVXcanon.LinOp()
+    Q.append((root_linPy, root_linC))
+
+    while len(Q) > 0:
+        linPy, linC = Q.popleft()
+
+        # Updating the arguments our LinOp
+        for argPy in linPy.args:
+            tree = CVXcanon.LinOp()
+            tmp.append(tree)
+            Q.append((argPy, tree))
+            linC.args.push_back(tree)
+
+        # Setting the type of our lin op
+        linC.type = get_type(linPy.type.upper())
+
+        # Setting size
+        linC.size.push_back(int(linPy.size[0]))
+        linC.size.push_back(int(linPy.size[1]))
+
+        # Loading the problem data into the appropriate array format
+        if linPy.data is None:
+            pass
+        elif isinstance(linPy.data, tuple) and isinstance(linPy.data[0], slice):
+            set_slice_data(linC, linPy)
+        elif isinstance(linPy.data, float) or isinstance(linPy.data, int):
+            linC.set_dense_data(format_matrix(linPy.data, 'scalar'))
+        elif isinstance(linPy.data, lin_ops.lin_op.LinOp) and linPy.data.type == 'scalar_const':
+            linC.set_dense_data(format_matrix(linPy.data.data, 'scalar'))
+        else:
+            set_matrix_data(linC, linPy)
+
+    return root_linC
+
+def get_constraint_node(c, tmp):
+    root = CVXcanon.LinOp()
+    try:
+        root.size.push_back(c.size[0])
+        root.size.push_back(c.size[1])
+    except:
+        return None
+        #root.size.push_back(c.size[0][0])
+        #root.size.push_back(c.size[0][1])
+
+    # add ID as dense_data
+    root.set_dense_data(format_matrix(c.constr_id, 'scalar'))
+
+    if isinstance(c, lin_ops.LinEqConstr):
+        root.type = CVXcanon.EQ
+        expr = build_lin_op_tree(c.expr, tmp)
+        tmp.append(expr)
+        root.args.push_back(expr)
+
+    elif isinstance(c, lin_ops.LinLeqConstr):
+        root.type = CVXcanon.LEQ
+        expr = build_lin_op_tree(c.expr, tmp)
+        tmp.append(expr)
+        root.args.push_back(expr)
+
+    elif isinstance(c, constraints.SOC):
+        root.type = CVXcanon.SOC
+        t = build_lin_op_tree(c.t, tmp)
+        tmp.append(t)
+        root.args.push_back(t)
+        for elem in c.x_elems:
+            x_elem = build_lin_op_tree(elem, tmp)
+            tmp.append(x_elem)
+            root.args.push_back(x_elem)
+
+    elif isinstance(c, constraints.ExpCone):
+        root.type = CVXcanon.EXP
+        x = build_lin_op_tree(c.x, tmp)
+        y = build_lin_op_tree(c.y, tmp)
+        z = build_lin_op_tree(c.z, tmp)
+        root.args.push_back(x)
+        root.args.push_back(y)
+        root.args.push_back(z)
+        tmp += [x, y, z]
+
+    elif isinstance(c, constraints.SDP):
+        raise NotImplementedError("SDP")
+
+    else:
+        raise TypeError("Undefined constraint type")
+
+    return root
 
 # TGraphVX inherits from the TUNGraph object defined by Snap.py
 class TGraphVX(TUNGraph):
@@ -310,6 +484,10 @@ class TGraphVX(TUNGraph):
         if verbose:
             print 'Distributed ADMM (%d processors)' % num_processors
 
+        ADMM_obj = ADMM()
+        node_objectives = LinOpVector();
+        node_constraints = LinOpVector2D();
+        
         # Organize information for each node in helper node_info structure
         node_info = {}
         # Keeps track of the current offset necessary into the shared node
@@ -322,17 +500,35 @@ class TGraphVX(TUNGraph):
             variables = self.node_variables[nid]
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
+            norms = 0
             # Node's constraints include those imposed by edges
             for neighborId in neighbors:
                 etup = self.__GetEdgeTup(nid, neighborId)
                 econ = self.edge_constraints[etup]
                 con += econ
+                for (varID, varName, var, offset) in variables:
+                    norms += square(norm(var))
+            prob = Problem(m_func(obj+norms),con)
+            obj_canon,cons_canon = prob.canonicalize()
+            #print obj_canon,cons_canon
+            tmp = []
+            node_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
+            cons = LinOpVector()
+            for constr in cons_canon:
+                #print constr.t,constr.size
+                root = get_constraint_node(constr, tmp)
+                if root is not None:
+                    tmp.append(root)
+                    cons.push_back(root)
+            node_constraints.push_back(cons)
             # Calculate sum of dimensions of all Variables for this node
             size = sum([var.size[0] for (varID, varName, var, offset) in variables])
             # Nearly complete information package for this node
             node_info[nid] = (nid, obj, variables, con, length, size, deg,\
                 neighbors)
             length += size
+        ADMM_obj.LoadNodes(node_objectives,node_constraints)
+        print "loaded the nodes"
         node_vals = multiprocessing.Array('d', [0.0] * length)
         x_length = length
 
@@ -343,6 +539,8 @@ class TGraphVX(TUNGraph):
         # Keeps track of the current offset necessary into the shared edge
         # values Arrays
         length = 0
+        edge_objectives = LinOpVector();
+        edge_constraints = LinOpVector2D();
         for ei in self.Edges():
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             obj = self.edge_objectives[etup]
@@ -362,8 +560,28 @@ class TGraphVX(TUNGraph):
             tup = (etup, obj, con,\
                 info_i[X_VARS], info_i[X_LEN], info_i[X_IND], ind_zij, ind_uij,\
                 info_j[X_VARS], info_j[X_LEN], info_j[X_IND], ind_zji, ind_uji)
+            norms = 0
+            for (varID, varName, var, offset) in info_i[X_VARS]:
+                    norms += square(norm(var))
+            for (varID, varName, var, offset) in info_j[X_VARS]:
+                    norms += square(norm(var))
+            obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
+            tmp = []
+            edge_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
+            cons = LinOpVector()
+            for constr in cons_canon:
+                #print constr.t,constr.size
+                root = get_constraint_node(constr, tmp)
+                if root is not None:
+                    tmp.append(root)
+                    cons.push_back(root)
+            edge_constraints.push_back(cons)
+            #edge_objectives.push_back(obj_canon)
+            #edge_constraints.push_back(cons_canon)
             edge_list.append(tup)
             edge_info[etup] = tup
+        ADMM_obj.LoadEdges(edge_objectives,edge_constraints)
+        print "loaded the edges"
         edge_z_vals = multiprocessing.Array('d', [0.0] * length)
         edge_u_vals = multiprocessing.Array('d', [0.0] * length)
         z_length = length
@@ -408,12 +626,13 @@ class TGraphVX(TUNGraph):
         #if __name__ == '__main__':
         #print __name__
         #multiprocessing.freeze_support()
-        pool = multiprocessing.Pool(num_processors)
+        #pool = multiprocessing.Pool(num_processors)
+        ADMM_obj.Solve()
         num_iterations = 0
         z_old = getValue(edge_z_vals, 0, z_length)
         # Proceed until convergence criteria are achieved or the maximum
         # number of iterations has passed
-        while num_iterations <= maxIters:
+        """while num_iterations <= maxIters:
             # Check convergence criteria
             if num_iterations != 0:
                 x = getValue(node_vals, 0, x_length)
@@ -460,7 +679,7 @@ class TGraphVX(TUNGraph):
         else:
             self.status = 'Incomplete: max iterations reached'
         self.value = self.GetTotalProblemValue()
-
+    """
     # Iterate through all variables and update values.
     # Sum all objective values over all nodes and edges.
     def GetTotalProblemValue(self):
@@ -476,7 +695,7 @@ class TGraphVX(TUNGraph):
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             result += self.edge_objectives[etup].value
         return result
-
+    
     # Returns True if convergence criteria have been satisfied
     # eps_abs = eps_rel = 0.01
     # r = Ax - z

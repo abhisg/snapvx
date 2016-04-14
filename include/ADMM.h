@@ -22,6 +22,7 @@ class ADMM
 		void ADMM_u(int);
 		//void copyLinop(LinOp* const&,LinOp* const&);
 	public:
+		ADMM();
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void Solve();
