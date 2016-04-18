@@ -510,7 +510,7 @@ class TGraphVX(TUNGraph):
                     norms += square(norm(var))
             prob = Problem(m_func(obj+norms),con)
             obj_canon,cons_canon = prob.canonicalize()
-            #print obj_canon,cons_canon
+            print obj_canon,cons_canon
             tmp = []
             node_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
             cons = LinOpVector()
@@ -576,6 +576,7 @@ class TGraphVX(TUNGraph):
                     tmp.append(root)
                     cons.push_back(root)
             edge_constraints.push_back(cons)
+            print "Constraint",cons
             #edge_objectives.push_back(obj_canon)
             #edge_constraints.push_back(cons_canon)
             edge_list.append(tup)
