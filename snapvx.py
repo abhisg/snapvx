@@ -507,7 +507,7 @@ class TGraphVX(TUNGraph):
                 econ = self.edge_constraints[etup]
                 con += econ
                 for (varID, varName, var, offset) in variables:
-                    norms += square(norm(var))
+                    norms += square(norm(var-numpy.zeros((var.size[0],1))))
             prob = Problem(m_func(obj+norms),con)
             obj_canon,cons_canon = prob.canonicalize()
             print obj_canon,cons_canon

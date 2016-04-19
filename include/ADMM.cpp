@@ -18,9 +18,9 @@ void ADMM::LoadNodes(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 	for ( int i = 0 ; i < constraints.size(); ++i ){
 		std::vector<LinOp*> cons_vec;
 		std::cout << "Constraint " << i << " " <<  constraints[i].size() << "\n";
-		/*for ( int j = 0 ; j < constraints[i].size(); j++ ){
+		for ( int j = 0 ; j < constraints[i].size(); j++ ){
 			cons_vec.push_back(constraints[i][j]);
-		}*/
+		}
 		node_constraints.push_back(cons_vec);
 	}
 }
@@ -33,9 +33,9 @@ void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 	for ( int i = 0 ; i < constraints.size(); ++i ){
 		std::vector<LinOp*> cons_vec;
 		std::cout << "Constraint " << i << " " <<  constraints[i].size() << "\n";
-		/*for ( int j = 0 ; j < constraints[i].size(); j++ ){
+		for ( int j = 0 ; j < constraints[i].size(); j++ ){
 			cons_vec.push_back(constraints[i][j]);
-		}*/
+		}
 		edge_constraints.push_back(cons_vec);
 	}
 }

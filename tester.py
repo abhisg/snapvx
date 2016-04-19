@@ -6,10 +6,10 @@ gvx = TGraphVX()
 
 #Use CVXPY syntax to define a problem
 x1 = Variable(1, name='x1')
-obj = square(x1)
+obj = square(x1-1)
 #Add Node 1 with the given objective, with the constraint that x1 <= 10
-#gvx.AddNode(1, Objective=obj, Constraints=[x1 <= 10])
-gvx.AddNode(1, obj, [x1<=10])
+gvx.AddNode(1, Objective=obj, Constraints=[])
+#gvx.AddNode(1, obj, [])
 
 #Similarly, add Node 2 with objective |x2 + 3|
 x2 = Variable(1, name='x2')
