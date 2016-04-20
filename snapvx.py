@@ -305,7 +305,8 @@ class TGraphVX(TUNGraph):
     # maxIters optional parameter: Maximum iterations for distributed ADMM.
     def Solve(self, M=Minimize, UseADMM=True, NumProcessors=0, Rho=1.0,
               MaxIters=250, EpsAbs=0.01, EpsRel=0.01, Verbose=False, 
-              UseClustering = False, ClusterSize = 1000 ):
+              UseClustering = False, ClusterSize = 1000,
+              proximalNode=None,proximalEdge=None ):
         global m_func
         m_func = M
 
@@ -493,11 +494,15 @@ class TGraphVX(TUNGraph):
         # Keeps track of the current offset necessary into the shared node
         # values Array
         length = 0
+        node_vars_map,node_map_offset = {},0
         for ni in self.Nodes():
             nid = ni.GetId()
             deg = ni.GetDeg()
             obj = self.node_objectives[nid]
             variables = self.node_variables[nid]
+            for (varID, varName, var, offset) in variables:
+                node_vars_map[(ni,varID)] = node_map_offset
+                node_map_offset += 1
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
             norms = 0
@@ -539,8 +544,11 @@ class TGraphVX(TUNGraph):
         # Keeps track of the current offset necessary into the shared edge
         # values Arrays
         length = 0
-        edge_objectives = LinOpVector();
-        edge_constraints = LinOpVector2D();
+        edge_map_info,edge_map_offset = {},0
+        edge_objectives = LinOpVector()
+        edge_constraints = LinOpVector2D()
+        node_var_idx = obj.PairVector()
+        edge_var_idx = obj.PairVector()
         for ei in self.Edges():
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             obj = self.edge_objectives[etup]
@@ -562,9 +570,21 @@ class TGraphVX(TUNGraph):
                 info_j[X_VARS], info_j[X_LEN], info_j[X_IND], ind_zji, ind_uji)
             norms = 0
             for (varID, varName, var, offset) in info_i[X_VARS]:
+                    edge_map_info[(varID,etup[0],etup[1])] = edge_map_offset
+                    edge_map_offset += 1
                     norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
+                    edge_map_info[(varID,etup[1],etup[0])] = edge_map_offset
+                    edge_map_offset += 1
                     norms += square(norm(var))
+            for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
+                for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
+                    pair_node = Pair(node_map_offset[(i_varID,etup[0])],\
+                                     node_map_offset[(j_varID,etup[1])])
+                    node_var_idx.push_back(pair_node)
+                    pair_edge = Pair(edge_map_offset[(i_varID,etup[0],etup[1])],\
+                                     edge_map_offset[(j_varID,etup[1],etup[0])])
+                    edge_var_idx.push_back(pair_edge)
             obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
             tmp = []
             edge_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
@@ -611,11 +631,24 @@ class TGraphVX(TUNGraph):
         # Create final node_list structure by adding on information for
         # node neighbors
         node_list = []
+        x_var_idx = IntVector2D();
+        neighbour_var_idx = IntVector3D();
         for nid, info in node_info.iteritems():
             entry = [nid, info[X_OBJ], info[X_VARS], info[X_CON], info[X_IND],\
                 info[X_LEN], info[X_DEG]]
             # Append information about z- and u-value indices for each
             # node neighbor
+            current_node_vars = IntVector();
+            current_node_edge_vars = IntVector2D();
+            for (varID, varName, var, offset) in info_i[X_VARS]:
+                current_node_vars.push_back(node_map_offset[(varID,nid)])
+                current_edge_vars = IntVector();
+                for i in xrange(info[X_DEG]):
+                    neighborId = info[X_NEIGHBORS][i]
+                    current_edge_vars.push_back(edge_map_info[(varID,nid,neighborId)])
+                current_node_edge_vars.push_back(current_edge_vars)
+            neighbour_var_idx.push_back(current_node_edge_vars)
+            x_var_idx.push_back(current_node_vars)
             for i in xrange(info[X_DEG]):
                 neighborId = info[X_NEIGHBORS][i]
                 indices = (Z_ZIJIND, Z_UIJIND) if nid < neighborId else\

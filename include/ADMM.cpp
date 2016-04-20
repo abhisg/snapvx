@@ -47,6 +47,7 @@ void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 
 void LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > x_var_idx,std::vector<std::vector<std::vector<int> > > neighbour_var_idx,arg=0)
 {
+	//need zij and uij for all neighbours of i
 	node_prox = prox;
 	prox_node_arg = arg;
 	for ( int i = 0 ; i < x_var_idx.size(); ++i){
@@ -61,6 +62,7 @@ void LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > x_va
 
 void LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > edge_var_idx,std::vector<std::vector<std::pair<int,int> > > node_var_idx,arg=0)
 {
+	//need xi and uij for all zij
 	edge_prox = prox;
 	prox_edge_arg = arg;
 	for ( int i = 0 ; i < edge_var_idx.size(); ++i ){
@@ -95,6 +97,14 @@ void ADMM::ADMM_x(int i){
 	}
 	else{
 		//solve using prox operator update
+		switch(node_prox){
+			case SQUARE:
+					break;
+			case LASSO:
+					break;
+			default:std::cout<<"not implemented yet";exit(-1);
+		}
+			
 	}
 }
 
@@ -103,12 +113,24 @@ void ADMM::ADMM_z(int i){
 	//*edge_z_vals[i] = solve(MINIMIZE,edge_objectives[i],edge_constraints[i],solver_options);
 	if ( edge_list[i]->edge_objective != NULL ){
 		Solution soln = solve(MINIMIZE,edge_objectives[i],edge_constraints[i],solver_options);
+		//yank out variables,update the eigen matrices
 	}
+	else{
+		switch(edge_prox){
+			case SQUARE:
+					break;
+			case LASSO:
+					break;
+			default:std::cout<<"not implemented yet";exit(-1);
+		}
 }
 
 void ADMM::ADMM_u(int i){
-	std::cout << "ADMM u called\n";
-	//TODO
+	for ( int j = 0 ; j < edge_list[i]->edge_var_idx.size(); ++j ){
+		edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first] - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
+		edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second] - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+	}
+		
 }
 
 std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_node_x_vals()
