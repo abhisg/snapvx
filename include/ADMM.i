@@ -9,8 +9,8 @@
         #include <cstdio>
 %}
 
-%include "CVXcanon/src/python/numpy.i"
 %include "std_vector.i"
+%include "CVXcanon/src/python/numpy.i"
 %include "std_map.i"
 %include "std_string.i"
 %include "std_pair.i"
@@ -31,5 +31,6 @@ namespace std {
    %template(solutionVector) vector<map<int,Eigen::MatrixXd> >;
    %template(IntPair) std::pair<int,int>;
    %template(PairVector) std::vector<std::pair<int,int> >;
+   %template(PairVector2D) std::vector<std::vector<std::pair<int,int> > >;
 }
 

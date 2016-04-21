@@ -501,7 +501,7 @@ class TGraphVX(TUNGraph):
             obj = self.node_objectives[nid]
             variables = self.node_variables[nid]
             for (varID, varName, var, offset) in variables:
-                node_vars_map[(ni,varID)] = node_map_offset
+                node_vars_map[(varID,nid)] = node_map_offset
                 node_map_offset += 1
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
@@ -511,9 +511,9 @@ class TGraphVX(TUNGraph):
                 etup = self.__GetEdgeTup(nid, neighborId)
                 econ = self.edge_constraints[etup]
                 con += econ
-                for (varID, varName, var, offset) in variables:
-                    norms += square(norm(var-numpy.zeros((var.size[0],1))))
-            prob = Problem(m_func(obj+norms),con)
+                #for (varID, varName, var, offset) in variables:
+                #    norms += square(norm(var-numpy.zeros((var.size[0],1))))
+            """prob = Problem(m_func(obj+norms),con)
             obj_canon,cons_canon = prob.canonicalize()
             print obj_canon,cons_canon
             tmp = []
@@ -525,15 +525,15 @@ class TGraphVX(TUNGraph):
                 if root is not None:
                     tmp.append(root)
                     cons.push_back(root)
-            node_constraints.push_back(cons)
+            node_constraints.push_back(cons)"""
             # Calculate sum of dimensions of all Variables for this node
             size = sum([var.size[0] for (varID, varName, var, offset) in variables])
             # Nearly complete information package for this node
             node_info[nid] = (nid, obj, variables, con, length, size, deg,\
                 neighbors)
             length += size
-        ADMM_obj.LoadNodes(node_objectives,node_constraints)
-        print "loaded the nodes"
+        #ADMM_obj.LoadNodes(node_objectives,node_constraints)
+        #print "loaded the nodes"
         node_vals = multiprocessing.Array('d', [0.0] * length)
         x_length = length
 
@@ -544,12 +544,15 @@ class TGraphVX(TUNGraph):
         # Keeps track of the current offset necessary into the shared edge
         # values Arrays
         length = 0
-        edge_map_info,edge_map_offset = {},0
+        edge_vars_map,edge_map_offset = {},0
         edge_objectives = LinOpVector()
         edge_constraints = LinOpVector2D()
-        node_var_idx = obj.PairVector()
-        edge_var_idx = obj.PairVector()
+        node_var_idx = PairVector2D()
+        edge_var_idx = PairVector2D()
+        print node_vars_map
         for ei in self.Edges():
+            current_node_var_idx = PairVector()
+            current_edge_var_idx = PairVector()
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             obj = self.edge_objectives[etup]
             con = self.edge_constraints[etup]
@@ -570,22 +573,26 @@ class TGraphVX(TUNGraph):
                 info_j[X_VARS], info_j[X_LEN], info_j[X_IND], ind_zji, ind_uji)
             norms = 0
             for (varID, varName, var, offset) in info_i[X_VARS]:
-                    edge_map_info[(varID,etup[0],etup[1])] = edge_map_offset
+                    print varID,etup[0],etup[1]
+                    edge_vars_map[(varID,etup[0],etup[1])] = edge_map_offset
                     edge_map_offset += 1
                     norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
-                    edge_map_info[(varID,etup[1],etup[0])] = edge_map_offset
+                    print varID,etup[1],etup[0]
+                    edge_vars_map[(varID,etup[1],etup[0])] = edge_map_offset
                     edge_map_offset += 1
                     norms += square(norm(var))
             for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
                 for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
-                    pair_node = Pair(node_map_offset[(i_varID,etup[0])],\
-                                     node_map_offset[(j_varID,etup[1])])
-                    node_var_idx.push_back(pair_node)
-                    pair_edge = Pair(edge_map_offset[(i_varID,etup[0],etup[1])],\
-                                     edge_map_offset[(j_varID,etup[1],etup[0])])
-                    edge_var_idx.push_back(pair_edge)
-            obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
+                    pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
+                                     node_vars_map[(j_varID,etup[1])])
+                    current_node_var_idx.push_back(pair_node)
+                    pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
+                                     edge_vars_map[(j_varID,etup[1],etup[0])])
+                    current_edge_var_idx.push_back(pair_edge)
+            node_var_idx.push_back(current_node_var_idx)
+            edge_var_idx.push_back(current_edge_var_idx)
+            """obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
             tmp = []
             edge_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
             cons = LinOpVector()
@@ -598,11 +605,11 @@ class TGraphVX(TUNGraph):
             edge_constraints.push_back(cons)
             print "Constraint",cons
             #edge_objectives.push_back(obj_canon)
-            #edge_constraints.push_back(cons_canon)
+            #edge_constraints.push_back(cons_canon)"""
             edge_list.append(tup)
             edge_info[etup] = tup
-        ADMM_obj.LoadEdges(edge_objectives,edge_constraints)
-        print "loaded the edges"
+        #ADMM_obj.LoadEdges(edge_objectives,edge_constraints)
+        #print "loaded the edges"
         edge_z_vals = multiprocessing.Array('d', [0.0] * length)
         edge_u_vals = multiprocessing.Array('d', [0.0] * length)
         z_length = length
@@ -632,23 +639,27 @@ class TGraphVX(TUNGraph):
         # node neighbors
         node_list = []
         x_var_idx = IntVector2D();
+        x_var_sizes = IntVector2D();
         neighbour_var_idx = IntVector3D();
         for nid, info in node_info.iteritems():
             entry = [nid, info[X_OBJ], info[X_VARS], info[X_CON], info[X_IND],\
                 info[X_LEN], info[X_DEG]]
             # Append information about z- and u-value indices for each
             # node neighbor
-            current_node_vars = IntVector();
-            current_node_edge_vars = IntVector2D();
-            for (varID, varName, var, offset) in info_i[X_VARS]:
-                current_node_vars.push_back(node_map_offset[(varID,nid)])
+            current_node_vars,current_node_vars_sizes = IntVector(),IntVector()
+            current_node_edge_vars = IntVector2D()
+            for (varID, varName, var, offset) in info[X_VARS]:
+                current_node_vars.push_back(node_vars_map[(varID,nid)])
+                current_node_vars_sizes.push_back(var.size[0])
                 current_edge_vars = IntVector();
                 for i in xrange(info[X_DEG]):
                     neighborId = info[X_NEIGHBORS][i]
-                    current_edge_vars.push_back(edge_map_info[(varID,nid,neighborId)])
+                    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
+                print varID,nid,current_edge_vars
                 current_node_edge_vars.push_back(current_edge_vars)
             neighbour_var_idx.push_back(current_node_edge_vars)
             x_var_idx.push_back(current_node_vars)
+            x_var_sizes.push_back(current_node_vars_sizes)
             for i in xrange(info[X_DEG]):
                 neighborId = info[X_NEIGHBORS][i]
                 indices = (Z_ZIJIND, Z_UIJIND) if nid < neighborId else\
@@ -661,12 +672,14 @@ class TGraphVX(TUNGraph):
         #print __name__
         #multiprocessing.freeze_support()
         #pool = multiprocessing.Pool(num_processors)
+        ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,neighbour_var_idx,x_var_sizes,0)
+        ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         ADMM_obj.Solve()
-        num_iterations = 0
+        """num_iterations = 0
         z_old = getValue(edge_z_vals, 0, z_length)
         # Proceed until convergence criteria are achieved or the maximum
         # number of iterations has passed
-        """while num_iterations <= maxIters:
+        while num_iterations <= maxIters:
             # Check convergence criteria
             if num_iterations != 0:
                 x = getValue(node_vals, 0, x_length)
@@ -690,16 +703,16 @@ class TGraphVX(TUNGraph):
             if verbose:
                 # Debugging information prints current iteration #
                 print 'Iteration %d' % num_iterations
-            if os.name != 'nt':
-                pool.map(ADMM_x, node_list)
-                pool.map(ADMM_z, edge_list)
-                pool.map(ADMM_u, edge_list)
-            else:
-                map(ADMM_x, node_list)
-                map(ADMM_z, edge_list)
-                map(ADMM_u, edge_list)
-        pool.close()
-        pool.join()
+            #if os.name != 'nt':
+            #    pool.map(ADMM_x, node_list)
+            #    pool.map(ADMM_z, edge_list)
+            #    pool.map(ADMM_u, edge_list)
+            #else:
+            map(ADMM_x, node_list)
+            map(ADMM_z, edge_list)
+            map(ADMM_u, edge_list)
+        #pool.close()
+        #pool.join()
 
         # Insert into hash to support GetNodeValue()
         for entry in node_list:
@@ -712,8 +725,8 @@ class TGraphVX(TUNGraph):
             self.status = 'Optimal'
         else:
             self.status = 'Incomplete: max iterations reached'
-        self.value = self.GetTotalProblemValue()
-    """
+        self.value = self.GetTotalProblemValue()"""
+    
     # Iterate through all variables and update values.
     # Sum all objective values over all nodes and edges.
     def GetTotalProblemValue(self):
@@ -1240,6 +1253,7 @@ def writeObjective(sharedarr, index, objective, variables):
 # x-update for ADMM for one node
 def ADMM_x(entry):
     global rho
+    print "ADMM x"
     variables = entry[X_VARS]
     norms = 0
     # Iterate through all neighbors of the node

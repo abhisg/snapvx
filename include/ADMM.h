@@ -38,9 +38,9 @@ class ADMM
 		std::vector<std::vector< LinOp *> > edge_constraints;*/
 		std::vector<Node *> node_list;
 		std::vector<Edge *> edge_list;
-		std::vector<Eigen::MatrixXd> node_x_vals;
-		std::vector<Eigen::MatrixXd> edge_z_vals;
-		std::vector<Eigen::MatrixXd> edge_u_vals;
+		std::map<int,Eigen::MatrixXd> node_x_vals;
+		std::map<int,Eigen::MatrixXd> edge_z_vals;
+		std::map<int,Eigen::MatrixXd> edge_u_vals;
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_node_arg;
@@ -56,12 +56,12 @@ class ADMM
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);*/
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<int> > >,arg);
-		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > >,std::vector<std::vector<std::pair<int,int> > >,arg);
+		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<int> > >,std::vector<std::vector<int> >,int);
+		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > >,std::vector<std::vector<std::pair<int,int> > >,int);
 		void Solve();
-		std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();
+		/*std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();
 		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_z_vals();
-		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_u_vals();
+		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_u_vals();*/
 };
 
 #endif		
