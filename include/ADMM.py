@@ -119,6 +119,9 @@ class Node(_object):
     __swig_setmethods__["x_var_idx"] = _ADMM.Node_x_var_idx_set
     __swig_getmethods__["x_var_idx"] = _ADMM.Node_x_var_idx_get
     if _newclass:x_var_idx = _swig_property(_ADMM.Node_x_var_idx_get, _ADMM.Node_x_var_idx_set)
+    __swig_setmethods__["args"] = _ADMM.Node_args_set
+    __swig_getmethods__["args"] = _ADMM.Node_args_get
+    if _newclass:args = _swig_property(_ADMM.Node_args_get, _ADMM.Node_args_set)
     def __init__(self): 
         this = _ADMM.new_Node()
         try: self.this.append(this)
@@ -316,6 +319,147 @@ class IntVector3D(_object):
 IntVector3D_swigregister = _ADMM.IntVector3D_swigregister
 IntVector3D_swigregister(IntVector3D)
 
+class DoubleVector(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, DoubleVector, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, DoubleVector, name)
+    __repr__ = _swig_repr
+    def iterator(self): return _ADMM.DoubleVector_iterator(self)
+    def __iter__(self): return self.iterator()
+    def __nonzero__(self): return _ADMM.DoubleVector___nonzero__(self)
+    def __bool__(self): return _ADMM.DoubleVector___bool__(self)
+    def __len__(self): return _ADMM.DoubleVector___len__(self)
+    def pop(self): return _ADMM.DoubleVector_pop(self)
+    def __getslice__(self, *args): return _ADMM.DoubleVector___getslice__(self, *args)
+    def __setslice__(self, *args): return _ADMM.DoubleVector___setslice__(self, *args)
+    def __delslice__(self, *args): return _ADMM.DoubleVector___delslice__(self, *args)
+    def __delitem__(self, *args): return _ADMM.DoubleVector___delitem__(self, *args)
+    def __getitem__(self, *args): return _ADMM.DoubleVector___getitem__(self, *args)
+    def __setitem__(self, *args): return _ADMM.DoubleVector___setitem__(self, *args)
+    def append(self, *args): return _ADMM.DoubleVector_append(self, *args)
+    def empty(self): return _ADMM.DoubleVector_empty(self)
+    def size(self): return _ADMM.DoubleVector_size(self)
+    def clear(self): return _ADMM.DoubleVector_clear(self)
+    def swap(self, *args): return _ADMM.DoubleVector_swap(self, *args)
+    def get_allocator(self): return _ADMM.DoubleVector_get_allocator(self)
+    def begin(self): return _ADMM.DoubleVector_begin(self)
+    def end(self): return _ADMM.DoubleVector_end(self)
+    def rbegin(self): return _ADMM.DoubleVector_rbegin(self)
+    def rend(self): return _ADMM.DoubleVector_rend(self)
+    def pop_back(self): return _ADMM.DoubleVector_pop_back(self)
+    def erase(self, *args): return _ADMM.DoubleVector_erase(self, *args)
+    def __init__(self, *args): 
+        this = _ADMM.new_DoubleVector(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def push_back(self, *args): return _ADMM.DoubleVector_push_back(self, *args)
+    def front(self): return _ADMM.DoubleVector_front(self)
+    def back(self): return _ADMM.DoubleVector_back(self)
+    def assign(self, *args): return _ADMM.DoubleVector_assign(self, *args)
+    def resize(self, *args): return _ADMM.DoubleVector_resize(self, *args)
+    def insert(self, *args): return _ADMM.DoubleVector_insert(self, *args)
+    def reserve(self, *args): return _ADMM.DoubleVector_reserve(self, *args)
+    def capacity(self): return _ADMM.DoubleVector_capacity(self)
+    __swig_destroy__ = _ADMM.delete_DoubleVector
+    __del__ = lambda self : None;
+DoubleVector_swigregister = _ADMM.DoubleVector_swigregister
+DoubleVector_swigregister(DoubleVector)
+
+class DoubleVector2D(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, DoubleVector2D, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, DoubleVector2D, name)
+    __repr__ = _swig_repr
+    def iterator(self): return _ADMM.DoubleVector2D_iterator(self)
+    def __iter__(self): return self.iterator()
+    def __nonzero__(self): return _ADMM.DoubleVector2D___nonzero__(self)
+    def __bool__(self): return _ADMM.DoubleVector2D___bool__(self)
+    def __len__(self): return _ADMM.DoubleVector2D___len__(self)
+    def pop(self): return _ADMM.DoubleVector2D_pop(self)
+    def __getslice__(self, *args): return _ADMM.DoubleVector2D___getslice__(self, *args)
+    def __setslice__(self, *args): return _ADMM.DoubleVector2D___setslice__(self, *args)
+    def __delslice__(self, *args): return _ADMM.DoubleVector2D___delslice__(self, *args)
+    def __delitem__(self, *args): return _ADMM.DoubleVector2D___delitem__(self, *args)
+    def __getitem__(self, *args): return _ADMM.DoubleVector2D___getitem__(self, *args)
+    def __setitem__(self, *args): return _ADMM.DoubleVector2D___setitem__(self, *args)
+    def append(self, *args): return _ADMM.DoubleVector2D_append(self, *args)
+    def empty(self): return _ADMM.DoubleVector2D_empty(self)
+    def size(self): return _ADMM.DoubleVector2D_size(self)
+    def clear(self): return _ADMM.DoubleVector2D_clear(self)
+    def swap(self, *args): return _ADMM.DoubleVector2D_swap(self, *args)
+    def get_allocator(self): return _ADMM.DoubleVector2D_get_allocator(self)
+    def begin(self): return _ADMM.DoubleVector2D_begin(self)
+    def end(self): return _ADMM.DoubleVector2D_end(self)
+    def rbegin(self): return _ADMM.DoubleVector2D_rbegin(self)
+    def rend(self): return _ADMM.DoubleVector2D_rend(self)
+    def pop_back(self): return _ADMM.DoubleVector2D_pop_back(self)
+    def erase(self, *args): return _ADMM.DoubleVector2D_erase(self, *args)
+    def __init__(self, *args): 
+        this = _ADMM.new_DoubleVector2D(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def push_back(self, *args): return _ADMM.DoubleVector2D_push_back(self, *args)
+    def front(self): return _ADMM.DoubleVector2D_front(self)
+    def back(self): return _ADMM.DoubleVector2D_back(self)
+    def assign(self, *args): return _ADMM.DoubleVector2D_assign(self, *args)
+    def resize(self, *args): return _ADMM.DoubleVector2D_resize(self, *args)
+    def insert(self, *args): return _ADMM.DoubleVector2D_insert(self, *args)
+    def reserve(self, *args): return _ADMM.DoubleVector2D_reserve(self, *args)
+    def capacity(self): return _ADMM.DoubleVector2D_capacity(self)
+    __swig_destroy__ = _ADMM.delete_DoubleVector2D
+    __del__ = lambda self : None;
+DoubleVector2D_swigregister = _ADMM.DoubleVector2D_swigregister
+DoubleVector2D_swigregister(DoubleVector2D)
+
+class DoubleVector3D(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, DoubleVector3D, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, DoubleVector3D, name)
+    __repr__ = _swig_repr
+    def iterator(self): return _ADMM.DoubleVector3D_iterator(self)
+    def __iter__(self): return self.iterator()
+    def __nonzero__(self): return _ADMM.DoubleVector3D___nonzero__(self)
+    def __bool__(self): return _ADMM.DoubleVector3D___bool__(self)
+    def __len__(self): return _ADMM.DoubleVector3D___len__(self)
+    def pop(self): return _ADMM.DoubleVector3D_pop(self)
+    def __getslice__(self, *args): return _ADMM.DoubleVector3D___getslice__(self, *args)
+    def __setslice__(self, *args): return _ADMM.DoubleVector3D___setslice__(self, *args)
+    def __delslice__(self, *args): return _ADMM.DoubleVector3D___delslice__(self, *args)
+    def __delitem__(self, *args): return _ADMM.DoubleVector3D___delitem__(self, *args)
+    def __getitem__(self, *args): return _ADMM.DoubleVector3D___getitem__(self, *args)
+    def __setitem__(self, *args): return _ADMM.DoubleVector3D___setitem__(self, *args)
+    def append(self, *args): return _ADMM.DoubleVector3D_append(self, *args)
+    def empty(self): return _ADMM.DoubleVector3D_empty(self)
+    def size(self): return _ADMM.DoubleVector3D_size(self)
+    def clear(self): return _ADMM.DoubleVector3D_clear(self)
+    def swap(self, *args): return _ADMM.DoubleVector3D_swap(self, *args)
+    def get_allocator(self): return _ADMM.DoubleVector3D_get_allocator(self)
+    def begin(self): return _ADMM.DoubleVector3D_begin(self)
+    def end(self): return _ADMM.DoubleVector3D_end(self)
+    def rbegin(self): return _ADMM.DoubleVector3D_rbegin(self)
+    def rend(self): return _ADMM.DoubleVector3D_rend(self)
+    def pop_back(self): return _ADMM.DoubleVector3D_pop_back(self)
+    def erase(self, *args): return _ADMM.DoubleVector3D_erase(self, *args)
+    def __init__(self, *args): 
+        this = _ADMM.new_DoubleVector3D(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def push_back(self, *args): return _ADMM.DoubleVector3D_push_back(self, *args)
+    def front(self): return _ADMM.DoubleVector3D_front(self)
+    def back(self): return _ADMM.DoubleVector3D_back(self)
+    def assign(self, *args): return _ADMM.DoubleVector3D_assign(self, *args)
+    def resize(self, *args): return _ADMM.DoubleVector3D_resize(self, *args)
+    def insert(self, *args): return _ADMM.DoubleVector3D_insert(self, *args)
+    def reserve(self, *args): return _ADMM.DoubleVector3D_reserve(self, *args)
+    def capacity(self): return _ADMM.DoubleVector3D_capacity(self)
+    __swig_destroy__ = _ADMM.delete_DoubleVector3D
+    __del__ = lambda self : None;
+DoubleVector3D_swigregister = _ADMM.DoubleVector3D_swigregister
+DoubleVector3D_swigregister(DoubleVector3D)
+
 class LinOpVector(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, LinOpVector, name, value)
@@ -410,101 +554,101 @@ class LinOpVector2D(_object):
 LinOpVector2D_swigregister = _ADMM.LinOpVector2D_swigregister
 LinOpVector2D_swigregister(LinOpVector2D)
 
-class solution(_object):
+class Solution(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, solution, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Solution, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, solution, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, Solution, name)
     __repr__ = _swig_repr
-    def iterator(self): return _ADMM.solution_iterator(self)
+    def iterator(self): return _ADMM.Solution_iterator(self)
     def __iter__(self): return self.iterator()
-    def __nonzero__(self): return _ADMM.solution___nonzero__(self)
-    def __bool__(self): return _ADMM.solution___bool__(self)
-    def __len__(self): return _ADMM.solution___len__(self)
+    def __nonzero__(self): return _ADMM.Solution___nonzero__(self)
+    def __bool__(self): return _ADMM.Solution___bool__(self)
+    def __len__(self): return _ADMM.Solution___len__(self)
     def __iter__(self): return self.key_iterator()
     def iterkeys(self): return self.key_iterator()
     def itervalues(self): return self.value_iterator()
     def iteritems(self): return self.iterator()
-    def __getitem__(self, *args): return _ADMM.solution___getitem__(self, *args)
-    def __delitem__(self, *args): return _ADMM.solution___delitem__(self, *args)
-    def has_key(self, *args): return _ADMM.solution_has_key(self, *args)
-    def keys(self): return _ADMM.solution_keys(self)
-    def values(self): return _ADMM.solution_values(self)
-    def items(self): return _ADMM.solution_items(self)
-    def __contains__(self, *args): return _ADMM.solution___contains__(self, *args)
-    def key_iterator(self): return _ADMM.solution_key_iterator(self)
-    def value_iterator(self): return _ADMM.solution_value_iterator(self)
-    def __setitem__(self, *args): return _ADMM.solution___setitem__(self, *args)
-    def asdict(self): return _ADMM.solution_asdict(self)
+    def __getitem__(self, *args): return _ADMM.Solution___getitem__(self, *args)
+    def __delitem__(self, *args): return _ADMM.Solution___delitem__(self, *args)
+    def has_key(self, *args): return _ADMM.Solution_has_key(self, *args)
+    def keys(self): return _ADMM.Solution_keys(self)
+    def values(self): return _ADMM.Solution_values(self)
+    def items(self): return _ADMM.Solution_items(self)
+    def __contains__(self, *args): return _ADMM.Solution___contains__(self, *args)
+    def key_iterator(self): return _ADMM.Solution_key_iterator(self)
+    def value_iterator(self): return _ADMM.Solution_value_iterator(self)
+    def __setitem__(self, *args): return _ADMM.Solution___setitem__(self, *args)
+    def asdict(self): return _ADMM.Solution_asdict(self)
     def __init__(self, *args): 
-        this = _ADMM.new_solution(*args)
+        this = _ADMM.new_Solution(*args)
         try: self.this.append(this)
         except: self.this = this
-    def empty(self): return _ADMM.solution_empty(self)
-    def size(self): return _ADMM.solution_size(self)
-    def clear(self): return _ADMM.solution_clear(self)
-    def swap(self, *args): return _ADMM.solution_swap(self, *args)
-    def get_allocator(self): return _ADMM.solution_get_allocator(self)
-    def begin(self): return _ADMM.solution_begin(self)
-    def end(self): return _ADMM.solution_end(self)
-    def rbegin(self): return _ADMM.solution_rbegin(self)
-    def rend(self): return _ADMM.solution_rend(self)
-    def count(self, *args): return _ADMM.solution_count(self, *args)
-    def erase(self, *args): return _ADMM.solution_erase(self, *args)
-    def find(self, *args): return _ADMM.solution_find(self, *args)
-    def lower_bound(self, *args): return _ADMM.solution_lower_bound(self, *args)
-    def upper_bound(self, *args): return _ADMM.solution_upper_bound(self, *args)
-    __swig_destroy__ = _ADMM.delete_solution
+    def empty(self): return _ADMM.Solution_empty(self)
+    def size(self): return _ADMM.Solution_size(self)
+    def clear(self): return _ADMM.Solution_clear(self)
+    def swap(self, *args): return _ADMM.Solution_swap(self, *args)
+    def get_allocator(self): return _ADMM.Solution_get_allocator(self)
+    def begin(self): return _ADMM.Solution_begin(self)
+    def end(self): return _ADMM.Solution_end(self)
+    def rbegin(self): return _ADMM.Solution_rbegin(self)
+    def rend(self): return _ADMM.Solution_rend(self)
+    def count(self, *args): return _ADMM.Solution_count(self, *args)
+    def erase(self, *args): return _ADMM.Solution_erase(self, *args)
+    def find(self, *args): return _ADMM.Solution_find(self, *args)
+    def lower_bound(self, *args): return _ADMM.Solution_lower_bound(self, *args)
+    def upper_bound(self, *args): return _ADMM.Solution_upper_bound(self, *args)
+    __swig_destroy__ = _ADMM.delete_Solution
     __del__ = lambda self : None;
-solution_swigregister = _ADMM.solution_swigregister
-solution_swigregister(solution)
+Solution_swigregister = _ADMM.Solution_swigregister
+Solution_swigregister(Solution)
 
-class solutionVector(_object):
+class SolutionVector(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, solutionVector, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, SolutionVector, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, solutionVector, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, SolutionVector, name)
     __repr__ = _swig_repr
-    def iterator(self): return _ADMM.solutionVector_iterator(self)
+    def iterator(self): return _ADMM.SolutionVector_iterator(self)
     def __iter__(self): return self.iterator()
-    def __nonzero__(self): return _ADMM.solutionVector___nonzero__(self)
-    def __bool__(self): return _ADMM.solutionVector___bool__(self)
-    def __len__(self): return _ADMM.solutionVector___len__(self)
-    def pop(self): return _ADMM.solutionVector_pop(self)
-    def __getslice__(self, *args): return _ADMM.solutionVector___getslice__(self, *args)
-    def __setslice__(self, *args): return _ADMM.solutionVector___setslice__(self, *args)
-    def __delslice__(self, *args): return _ADMM.solutionVector___delslice__(self, *args)
-    def __delitem__(self, *args): return _ADMM.solutionVector___delitem__(self, *args)
-    def __getitem__(self, *args): return _ADMM.solutionVector___getitem__(self, *args)
-    def __setitem__(self, *args): return _ADMM.solutionVector___setitem__(self, *args)
-    def append(self, *args): return _ADMM.solutionVector_append(self, *args)
-    def empty(self): return _ADMM.solutionVector_empty(self)
-    def size(self): return _ADMM.solutionVector_size(self)
-    def clear(self): return _ADMM.solutionVector_clear(self)
-    def swap(self, *args): return _ADMM.solutionVector_swap(self, *args)
-    def get_allocator(self): return _ADMM.solutionVector_get_allocator(self)
-    def begin(self): return _ADMM.solutionVector_begin(self)
-    def end(self): return _ADMM.solutionVector_end(self)
-    def rbegin(self): return _ADMM.solutionVector_rbegin(self)
-    def rend(self): return _ADMM.solutionVector_rend(self)
-    def pop_back(self): return _ADMM.solutionVector_pop_back(self)
-    def erase(self, *args): return _ADMM.solutionVector_erase(self, *args)
+    def __nonzero__(self): return _ADMM.SolutionVector___nonzero__(self)
+    def __bool__(self): return _ADMM.SolutionVector___bool__(self)
+    def __len__(self): return _ADMM.SolutionVector___len__(self)
+    def pop(self): return _ADMM.SolutionVector_pop(self)
+    def __getslice__(self, *args): return _ADMM.SolutionVector___getslice__(self, *args)
+    def __setslice__(self, *args): return _ADMM.SolutionVector___setslice__(self, *args)
+    def __delslice__(self, *args): return _ADMM.SolutionVector___delslice__(self, *args)
+    def __delitem__(self, *args): return _ADMM.SolutionVector___delitem__(self, *args)
+    def __getitem__(self, *args): return _ADMM.SolutionVector___getitem__(self, *args)
+    def __setitem__(self, *args): return _ADMM.SolutionVector___setitem__(self, *args)
+    def append(self, *args): return _ADMM.SolutionVector_append(self, *args)
+    def empty(self): return _ADMM.SolutionVector_empty(self)
+    def size(self): return _ADMM.SolutionVector_size(self)
+    def clear(self): return _ADMM.SolutionVector_clear(self)
+    def swap(self, *args): return _ADMM.SolutionVector_swap(self, *args)
+    def get_allocator(self): return _ADMM.SolutionVector_get_allocator(self)
+    def begin(self): return _ADMM.SolutionVector_begin(self)
+    def end(self): return _ADMM.SolutionVector_end(self)
+    def rbegin(self): return _ADMM.SolutionVector_rbegin(self)
+    def rend(self): return _ADMM.SolutionVector_rend(self)
+    def pop_back(self): return _ADMM.SolutionVector_pop_back(self)
+    def erase(self, *args): return _ADMM.SolutionVector_erase(self, *args)
     def __init__(self, *args): 
-        this = _ADMM.new_solutionVector(*args)
+        this = _ADMM.new_SolutionVector(*args)
         try: self.this.append(this)
         except: self.this = this
-    def push_back(self, *args): return _ADMM.solutionVector_push_back(self, *args)
-    def front(self): return _ADMM.solutionVector_front(self)
-    def back(self): return _ADMM.solutionVector_back(self)
-    def assign(self, *args): return _ADMM.solutionVector_assign(self, *args)
-    def resize(self, *args): return _ADMM.solutionVector_resize(self, *args)
-    def insert(self, *args): return _ADMM.solutionVector_insert(self, *args)
-    def reserve(self, *args): return _ADMM.solutionVector_reserve(self, *args)
-    def capacity(self): return _ADMM.solutionVector_capacity(self)
-    __swig_destroy__ = _ADMM.delete_solutionVector
+    def push_back(self, *args): return _ADMM.SolutionVector_push_back(self, *args)
+    def front(self): return _ADMM.SolutionVector_front(self)
+    def back(self): return _ADMM.SolutionVector_back(self)
+    def assign(self, *args): return _ADMM.SolutionVector_assign(self, *args)
+    def resize(self, *args): return _ADMM.SolutionVector_resize(self, *args)
+    def insert(self, *args): return _ADMM.SolutionVector_insert(self, *args)
+    def reserve(self, *args): return _ADMM.SolutionVector_reserve(self, *args)
+    def capacity(self): return _ADMM.SolutionVector_capacity(self)
+    __swig_destroy__ = _ADMM.delete_SolutionVector
     __del__ = lambda self : None;
-solutionVector_swigregister = _ADMM.solutionVector_swigregister
-solutionVector_swigregister(solutionVector)
+SolutionVector_swigregister = _ADMM.SolutionVector_swigregister
+SolutionVector_swigregister(SolutionVector)
 
 class IntPair(_object):
     __swig_setmethods__ = {}

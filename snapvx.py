@@ -262,6 +262,7 @@ class TGraphVX(TUNGraph):
         self.edge_objectives = {}
         self.edge_constraints = {}
         self.node_values = {}
+        self.proximal_args = {}
         self.all_variables = set()
         self.status = None
         self.value = None
@@ -486,23 +487,39 @@ class TGraphVX(TUNGraph):
             print 'Distributed ADMM (%d processors)' % num_processors
 
         ADMM_obj = ADMM()
-        node_objectives = LinOpVector();
-        node_constraints = LinOpVector2D();
-        
+        node_objectives = LinOpVector()
+        node_constraints = LinOpVector2D()
+        #proximal_args = DataVector()
         # Organize information for each node in helper node_info structure
         node_info = {}
         # Keeps track of the current offset necessary into the shared node
         # values Array
         length = 0
         node_vars_map,node_map_offset = {},0
+        #node_args = DataVector()
+        all_node_args = DoubleVector3D()
         for ni in self.Nodes():
             nid = ni.GetId()
             deg = ni.GetDeg()
             obj = self.node_objectives[nid]
             variables = self.node_variables[nid]
+            node_args = self.proximal_args[nid]
+            if node_args is None:
+                node_args = [[] for (varID, varName, var, offset) in variables]
+            sizes = []
             for (varID, varName, var, offset) in variables:
                 node_vars_map[(varID,nid)] = node_map_offset
+                sizes.append(var.size[0])
                 node_map_offset += 1
+            proximal_args = DoubleVector2D()
+            for j in xrange(len(node_args)):
+                argument = DoubleVector(sizes[j],0)
+                if node_args != []:
+                    for k in xrange(len(node_args[j])):
+                        argument[k] = node_args[j][k]
+                proximal_args.push_back(argument)
+            all_node_args.push_back(proximal_args)
+            print proximal_args
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
             norms = 0
@@ -672,7 +689,7 @@ class TGraphVX(TUNGraph):
         #print __name__
         #multiprocessing.freeze_support()
         #pool = multiprocessing.Pool(num_processors)
-        ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,neighbour_var_idx,x_var_sizes,0)
+        ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,neighbour_var_idx,x_var_sizes,all_node_args)
         ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         ADMM_obj.Solve()
         """num_iterations = 0
@@ -832,11 +849,12 @@ class TGraphVX(TUNGraph):
 
     # Adds a Node to the TUNGraph and stores the corresponding CVX information.
     def AddNode(self, NId, Objective=__default_objective,\
-            Constraints=__default_constraints):
+            Constraints=__default_constraints,proximalargs=None):
         self.__UpdateAllVariables(NId, Objective)
         self.node_objectives[NId] = Objective
         self.node_variables[NId] = self.__ExtractVariableList(Objective)
         self.node_constraints[NId] = Constraints
+        self.proximal_args[NId]=proximalargs
         return TUNGraph.AddNode(self, NId)
 
     def SetNodeObjective(self, NId, Objective):
@@ -844,6 +862,9 @@ class TGraphVX(TUNGraph):
         self.__UpdateAllVariables(NId, Objective)
         self.node_objectives[NId] = Objective
         self.node_variables[NId] = self.__ExtractVariableList(Objective)
+    
+    def SetNodeArgs(self,NId,arglist):
+        self.proximal_args[NId] = arglist
 
     def GetNodeObjective(self, NId):
         self.__VerifyNId(NId)
