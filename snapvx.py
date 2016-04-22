@@ -254,19 +254,23 @@ class TGraphVX(TUNGraph):
     # Constructor
     # If Graph is a Snap.py graph, initializes a SnapVX graph with the same
     # nodes and edges.
-    def __init__(self, Graph=None):
+    def __init__(self, Graph=None, use_proximal_updates=False):
         # Initialize data structures
         self.node_objectives = {}
         self.node_variables = {}
+        self.node_proximalOperator = {}
+        self.node_proximalArgs = {}
         self.node_constraints = {}
         self.edge_objectives = {}
         self.edge_constraints = {}
+        self.edge_proximalArgs = {}
+        self.edge_proximalOperator = {}
         self.node_values = {}
-        self.proximal_args = {}
         self.all_variables = set()
         self.status = None
         self.value = None
-
+        self.use_proximal_updates = use_proximal_updates
+        
         # Initialize superclass
         nodes = 0
         edges = 0
@@ -306,8 +310,7 @@ class TGraphVX(TUNGraph):
     # maxIters optional parameter: Maximum iterations for distributed ADMM.
     def Solve(self, M=Minimize, UseADMM=True, NumProcessors=0, Rho=1.0,
               MaxIters=250, EpsAbs=0.01, EpsRel=0.01, Verbose=False, 
-              UseClustering = False, ClusterSize = 1000,
-              proximalNode=None,proximalEdge=None ):
+              UseClustering = False, ClusterSize = 1000):
         global m_func
         m_func = M
 
@@ -503,7 +506,7 @@ class TGraphVX(TUNGraph):
             deg = ni.GetDeg()
             obj = self.node_objectives[nid]
             variables = self.node_variables[nid]
-            node_args = self.proximal_args[nid]
+            node_args = self.node_proximalArgs[nid]
             if node_args is None:
                 node_args = [[] for (varID, varName, var, offset) in variables]
             sizes = []
@@ -519,7 +522,6 @@ class TGraphVX(TUNGraph):
                         argument[k] = node_args[j][k]
                 proximal_args.push_back(argument)
             all_node_args.push_back(proximal_args)
-            print proximal_args
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
             norms = 0
@@ -566,7 +568,6 @@ class TGraphVX(TUNGraph):
         edge_constraints = LinOpVector2D()
         node_var_idx = PairVector2D()
         edge_var_idx = PairVector2D()
-        print node_vars_map
         for ei in self.Edges():
             current_node_var_idx = PairVector()
             current_edge_var_idx = PairVector()
@@ -590,23 +591,23 @@ class TGraphVX(TUNGraph):
                 info_j[X_VARS], info_j[X_LEN], info_j[X_IND], ind_zji, ind_uji)
             norms = 0
             for (varID, varName, var, offset) in info_i[X_VARS]:
-                    print varID,etup[0],etup[1]
                     edge_vars_map[(varID,etup[0],etup[1])] = edge_map_offset
                     edge_map_offset += 1
                     norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
-                    print varID,etup[1],etup[0]
                     edge_vars_map[(varID,etup[1],etup[0])] = edge_map_offset
                     edge_map_offset += 1
                     norms += square(norm(var))
+            edge_proximal_args = self.edge_proximalArgs[etup]
             for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
                 for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
-                    pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
+                    if (i_varID,j_varID) in edge_proximal_args:
+                        pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
                                      node_vars_map[(j_varID,etup[1])])
-                    current_node_var_idx.push_back(pair_node)
-                    pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
+                        current_node_var_idx.push_back(pair_node)
+                        pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
                                      edge_vars_map[(j_varID,etup[1],etup[0])])
-                    current_edge_var_idx.push_back(pair_edge)
+                        current_edge_var_idx.push_back(pair_edge)
             node_var_idx.push_back(current_node_var_idx)
             edge_var_idx.push_back(current_edge_var_idx)
             """obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
@@ -672,7 +673,6 @@ class TGraphVX(TUNGraph):
                 for i in xrange(info[X_DEG]):
                     neighborId = info[X_NEIGHBORS][i]
                     current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
-                print varID,nid,current_edge_vars
                 current_node_edge_vars.push_back(current_edge_vars)
             neighbour_var_idx.push_back(current_node_edge_vars)
             x_var_idx.push_back(current_node_vars)
@@ -689,6 +689,8 @@ class TGraphVX(TUNGraph):
         #print __name__
         #multiprocessing.freeze_support()
         #pool = multiprocessing.Pool(num_processors)
+        
+        #Don't hardcode these values you colossal fool!
         ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,neighbour_var_idx,x_var_sizes,all_node_args)
         ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         ADMM_obj.Solve()
@@ -849,23 +851,45 @@ class TGraphVX(TUNGraph):
 
     # Adds a Node to the TUNGraph and stores the corresponding CVX information.
     def AddNode(self, NId, Objective=__default_objective,\
-            Constraints=__default_constraints,proximalargs=None):
+            Constraints=__default_constraints):
         self.__UpdateAllVariables(NId, Objective)
         self.node_objectives[NId] = Objective
         self.node_variables[NId] = self.__ExtractVariableList(Objective)
         self.node_constraints[NId] = Constraints
-        self.proximal_args[NId]=proximalargs
         return TUNGraph.AddNode(self, NId)
-
+    
+    def AddNodeProximal(self,NId,proximalVariables,proximalArgs={},proximalOperator=SQUARE):
+        self.node_objectives[NId] = __default_objective
+        self.node_constraints[NId] = __default_constraints
+        self.node_variables[NId] = [(var.id,var.name(),var,0) \
+                                    for var in sorted(proximalVariables,key=lambda t:t.name())]
+        self.node_proximalArgs[NId] = []
+        for (_,_,var,_) in sorted(proximalVariables,key=lambda t:t.name()):
+            if var in proximalArgs:
+                self.node_proximalArgs[NId].append(proximalArgs[var])
+            else:
+                self.node_proximalArgs[NId].append([])
+        self.node_proximalOperator[NId] = proximalOperator
+        return TUNGraph.AddNode(self,NId)
+    
     def SetNodeObjective(self, NId, Objective):
         self.__VerifyNId(NId)
         self.__UpdateAllVariables(NId, Objective)
         self.node_objectives[NId] = Objective
         self.node_variables[NId] = self.__ExtractVariableList(Objective)
-    
-    def SetNodeArgs(self,NId,arglist):
-        self.proximal_args[NId] = arglist
 
+    def SetNodeProximalArgs(self,NId,proximalVariables,proximalArgs={},proximalOperator=SQUARE):
+        self.__VerifyNId(NId)
+        self.node_variables[NId] = [(var.id,var.name(),var,0) \
+                                    for var in sorted(proximalVariables,key=lambda t:t.name())]
+        self.node_proximalArgs[NId] = []
+        for var in sorted(proximalVariables,key=lambda t:t.name()):
+            if var in proximalArgs:
+                self.node_proximalArgs[NId].append(proximalArgs[var])
+            else:
+                self.node_proximalArgs[NId].append([])
+        self.node_proximalOperator[NId] = proximalOperator
+        
     def GetNodeObjective(self, NId):
         self.__VerifyNId(NId)
         return self.node_objectives[NId]
@@ -916,11 +940,37 @@ class TGraphVX(TUNGraph):
             self.edge_objectives[ETup] = Objective
             self.edge_constraints[ETup] = Constraints
         return TUNGraph.AddEdge(self, SrcNId, DstNId)
-
+    
+    def AddEdgeProximal(self,SrcNId,DstNId,proximalOperator=LASSO,proximalArgs=None):
+        ETup = self.__GetEdgeTup(SrcNId, DstNId)
+        self.edge_proximalOpearator[ETup] = proximalOperator
+        self.edge_proximalArgs[ETup] = {}
+        if proximalArgs is not None:
+            for (varSrc,varDst) in proximalArgs:
+                self.egde_proximalArgs[(varSrc.id,varDst.id)] = True
+        else:
+            for (varSrcId,_,_,_) in self.node_variables[SrcNId]:
+                for (varDstId,_,_,_) in self.node_variables[DstNId]:
+                    self.egde_proximalArgs[(varSrcId,varDstId)] = True
+        return TUNGraph.AddEdge(self, SrcNId, DstNId)
+    
     def SetEdgeObjective(self, SrcNId, DstNId, Objective):
         ETup = self.__GetEdgeTup(SrcNId, DstNId)
         self.__VerifyEdgeTup(ETup)
         self.edge_objectives[ETup] = Objective
+    
+    def SetEdgeProximalArgs(self,SrcNId,DstNId,proximalOperator=LASSO,proximalArgs=None):
+        ETup = self.__GetEdgeTup(SrcNId, DstNId)
+        self.__VerifyEdgeTup(ETup)
+        self.edge_proximalOperator[ETup] = proximalOperator
+        self.edge_proximalArgs[ETup] = {}
+        if proximalArgs is not None:
+            for (varSrc,varDst) in proximalArgs:
+                self.egde_proximalArgs[ETup][(varSrc.id,varDst.id)] = True
+        else:
+            for (varSrcId,_,_,_) in self.node_variables[SrcNId]:
+                for (varDstId,_,_,_) in self.node_variables[DstNId]:
+                    self.edge_proximalArgs[ETup][(varSrcId,varDstId)] = True
 
     def GetEdgeObjective(self, SrcNId, DstNId):
         ETup = self.__GetEdgeTup(SrcNId, DstNId)

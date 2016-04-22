@@ -141,20 +141,22 @@ void ADMM::ADMM_z(int i){
 					break;
 			case LASSO:	//std::cout << "yada yada z\n";
 					for ( int j = 0 ; j < edge_list[i]->edge_var_idx.size(); ++j ){
-						double theta = std::max(1-1.0/(node_x_vals[edge_list[i]->node_var_idx[j].first]+
-									edge_u_vals[edge_list[i]->edge_var_idx[j].first]-
-									node_x_vals[edge_list[i]->node_var_idx[j].second]-
-									edge_u_vals[edge_list[i]->edge_var_idx[j].second]).norm(),0.5);
-						edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first] + 
-													edge_u_vals[edge_list[i]->edge_var_idx[j].first])+
-											(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second]+
-                                                                        edge_u_vals[edge_list[i]->edge_var_idx[j].second]);
-						edge_z_vals[edge_list[i]->edge_var_idx[j].second] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].second] + 
-													edge_u_vals[edge_list[i]->edge_var_idx[j].second])+
-											(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first]+
-                                                                        edge_u_vals[edge_list[i]->edge_var_idx[j].first]);
-						//std::cout << "z " << edge_list[i]->edge_var_idx[j].first << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
-						//std::cout << "z " << edge_list[i]->edge_var_idx[j].second << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
+						if ( edge_list[i]->edge_var_idx[j].first != 0 || edge_list[i]->edge_var_idx[j].second != 0 ){
+							double theta = std::max(1-1.0/(node_x_vals[edge_list[i]->node_var_idx[j].first]+
+										edge_u_vals[edge_list[i]->edge_var_idx[j].first]-
+										node_x_vals[edge_list[i]->node_var_idx[j].second]-
+										edge_u_vals[edge_list[i]->edge_var_idx[j].second]).norm(),0.5);
+							edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first] + 
+														edge_u_vals[edge_list[i]->edge_var_idx[j].first])+
+												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second]+
+										edge_u_vals[edge_list[i]->edge_var_idx[j].second]);
+							edge_z_vals[edge_list[i]->edge_var_idx[j].second] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].second] + 
+														edge_u_vals[edge_list[i]->edge_var_idx[j].second])+
+												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first]+
+										edge_u_vals[edge_list[i]->edge_var_idx[j].first]);
+							//std::cout << "z " << edge_list[i]->edge_var_idx[j].first << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
+							//std::cout << "z " << edge_list[i]->edge_var_idx[j].second << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
+						}
 					}
 					break;
 			default:	std::cout<<"not implemented yet\n";
@@ -165,8 +167,10 @@ void ADMM::ADMM_z(int i){
 
 void ADMM::ADMM_u(int i){
 	for ( int j = 0 ; j < edge_list[i]->edge_var_idx.size(); ++j ){
-		edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first] - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
-		edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second] - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+		if ( edge_list[i]->edge_var_idx[j].first != 0 || edge_list[i]->edge_var_idx[j].second != 0 ){
+			edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first] - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
+			edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second] - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+		}
 		//std::cout << "u " << edge_list[i]->edge_var_idx[j].first << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
                 //std::cout << "u " << edge_list[i]->edge_var_idx[j].second << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
 

@@ -3,21 +3,25 @@ from snapvx import *
 import numpy as np
 
 np.random.seed(1)
-num_nodes = 100
-num_edges = 1000
-n = 50
+num_nodes = 1000
+num_edges = 30000
+n = 10
 snapGraph = GenRndGnm(PUNGraph, num_nodes, num_edges)
-gvx = TGraphVX(snapGraph)
+gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 
 #For each node, add an objective (using random data)
 for i in range(num_nodes):
 	x = Variable(n,name='x') #Each node has its own variable named 'x'
   	a = numpy.random.randn(n)
-  	gvx.SetNodeObjective(i, square(norm(x-a)))
-	gvx.SetNodeArgs(i,[a])
-def netLasso(src, dst, data):
-	return (norm(src['x'] - dst['x'],2), [])
-gvx.AddEdgeObjectives(netLasso)
+  	#gvx.SetNodeObjective(i, square(norm(x-a)))
+	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:a})
+#def netLasso(src, dst, data):
+#	return (norm(src['x'] - dst['x'],2), [])
+#gvx.AddEdgeObjectives(netLasso)
+for edge in gvx.Edges():
+	etup = edge.GetSrcNId(), edge.GetDstNId()
+	gvx.SetEdgeProximalArgs(etup[0],etup[1])
+	
 
 """#Create new graph
 gvx = TGraphVX()
