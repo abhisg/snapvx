@@ -17,6 +17,8 @@
 
 
 namespace std {
+   %template(StringVector) vector< string >;
+   %template(StringVector2D) vector<vector< string > >;
    %template(IntVector) vector< int >;
    %template(IntVector2D) vector<vector< int > >;
    %template(IntVector3D) vector<vector<vector< int > > >;

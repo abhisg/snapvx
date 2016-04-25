@@ -30,6 +30,13 @@ typedef struct Edge
 	std::vector<std::pair<int,int> > node_var_idx;
 }Edge;
 
+typedef struct Node_Var
+{
+	Eigen::MatrixXd value;
+	std::string name;
+	int nodeId;
+}Node_Var;
+
 class ADMM
 {
 	protected:
@@ -39,7 +46,8 @@ class ADMM
 		std::vector<std::vector< LinOp *> > edge_constraints;*/
 		std::vector<Node *> node_list;
 		std::vector<Edge *> edge_list;
-		std::map<int,Eigen::MatrixXd> node_x_vals;
+		//std::map<int,Eigen::MatrixXd> node_x_vals;
+		std::map<int,Node_Var> node_x_vals;
 		std::map<int,Eigen::MatrixXd> edge_z_vals;
 		std::map<int,Eigen::MatrixXd> edge_u_vals;
 		ProximalOperator edge_prox;
@@ -56,9 +64,11 @@ class ADMM
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);*/
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<int> > >,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<double> > >);
+		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> >,std::vector<std::vector<std::string> > x_var_names,
+					std::vector<std::vector<std::vector<int> > >,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<double> > >);
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > >,std::vector<std::vector<std::pair<int,int> > >,int);
 		void Solve();
+		void PrintSolution();
 		/*std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();
 		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_z_vals();
 		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_u_vals();*/

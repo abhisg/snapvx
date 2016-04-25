@@ -38,6 +38,7 @@ void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 }
 
 void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > x_var_idx,
+				std::vector<std::vector<std::string> > x_var_names,
 				std::vector<std::vector<std::vector<int> > > neighbour_var_idx,
 				std::vector<std::vector<int> > sizes,
 				std::vector<std::vector<std::vector<double> > > args)
@@ -52,7 +53,7 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		newnode->x_var_idx = x_var_idx[i];
 		newnode->args = std::vector<Eigen::MatrixXd>();
 		for ( int j = 0 ; j < x_var_idx[i].size(); ++j){
-			node_x_vals[x_var_idx[i][j]] = Eigen::MatrixXd(sizes[i][j],1);
+			node_x_vals[x_var_idx[i][j]] = {Eigen::MatrixXd(sizes[i][j],1),x_var_names[i][j],i};
 			for ( int k = 0 ; k < neighbour_var_idx[i][j].size(); ++k){
 				edge_u_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
 				edge_z_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
@@ -94,11 +95,15 @@ void ADMM::Solve()
 			ADMM_u(i);
 		}
 	}
-	for(int i = 0 ; i < node_x_vals.size(); ++ i){
-		std::cout << i << " " << node_x_vals[i].transpose() << "\n";
-	}
 }
 
+void ADMM::PrintSolution()
+{
+	for(int i = 0 ; i < node_x_vals.size(); ++ i){
+		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
+	}
+}
+	
 void ADMM::ADMM_x(int i){
 	//TODO : change the rho of the objective
 	//TODO : initialise the increment variable,add parameters in the square objective
@@ -115,7 +120,7 @@ void ADMM::ADMM_x(int i){
 						for ( int k = 0 ; k < node_list[i]->neighbour_var_idx[j].size(); ++k ){
 							increment += edge_z_vals[node_list[i]->neighbour_var_idx[j][k]] - edge_u_vals[node_list[i]->neighbour_var_idx[j][k]];
 						}
-						node_x_vals[node_list[i]->x_var_idx[j]] = increment*1.0/(2+node_list[i]->neighbour_var_idx[j].size());
+						node_x_vals[node_list[i]->x_var_idx[j]].value = increment*1.0/(2+node_list[i]->neighbour_var_idx[j].size());
 						//std::cout<<"x " << node_list[i]->x_var_idx[j]<<" "<<node_x_vals[node_list[i]->x_var_idx[j]]<<"\n";
 					}
 					
@@ -142,17 +147,17 @@ void ADMM::ADMM_z(int i){
 			case LASSO:	//std::cout << "yada yada z\n";
 					for ( int j = 0 ; j < edge_list[i]->edge_var_idx.size(); ++j ){
 						if ( edge_list[i]->edge_var_idx[j].first != 0 || edge_list[i]->edge_var_idx[j].second != 0 ){
-							double theta = std::max(1-1.0/(node_x_vals[edge_list[i]->node_var_idx[j].first]+
+							double theta = std::max(1-1.0/(node_x_vals[edge_list[i]->node_var_idx[j].first].value+
 										edge_u_vals[edge_list[i]->edge_var_idx[j].first]-
-										node_x_vals[edge_list[i]->node_var_idx[j].second]-
+										node_x_vals[edge_list[i]->node_var_idx[j].second].value-
 										edge_u_vals[edge_list[i]->edge_var_idx[j].second]).norm(),0.5);
-							edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first] + 
+							edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first].value + 
 														edge_u_vals[edge_list[i]->edge_var_idx[j].first])+
-												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second]+
+												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second].value+
 										edge_u_vals[edge_list[i]->edge_var_idx[j].second]);
-							edge_z_vals[edge_list[i]->edge_var_idx[j].second] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].second] + 
+							edge_z_vals[edge_list[i]->edge_var_idx[j].second] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].second].value + 
 														edge_u_vals[edge_list[i]->edge_var_idx[j].second])+
-												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first]+
+												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first].value+
 										edge_u_vals[edge_list[i]->edge_var_idx[j].first]);
 							//std::cout << "z " << edge_list[i]->edge_var_idx[j].first << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
 							//std::cout << "z " << edge_list[i]->edge_var_idx[j].second << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
@@ -168,8 +173,8 @@ void ADMM::ADMM_z(int i){
 void ADMM::ADMM_u(int i){
 	for ( int j = 0 ; j < edge_list[i]->edge_var_idx.size(); ++j ){
 		if ( edge_list[i]->edge_var_idx[j].first != 0 || edge_list[i]->edge_var_idx[j].second != 0 ){
-			edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first] - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
-			edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second] - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+			edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first].value - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
+			edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second].value - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
 		}
 		//std::cout << "u " << edge_list[i]->edge_var_idx[j].first << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
                 //std::cout << "u " << edge_list[i]->edge_var_idx[j].second << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";

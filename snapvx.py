@@ -270,6 +270,7 @@ class TGraphVX(TUNGraph):
         self.status = None
         self.value = None
         self.use_proximal_updates = use_proximal_updates
+        self.ADMM_obj = ADMM()
         
         # Initialize superclass
         nodes = 0
@@ -489,7 +490,6 @@ class TGraphVX(TUNGraph):
         if verbose:
             print 'Distributed ADMM (%d processors)' % num_processors
 
-        ADMM_obj = ADMM()
         node_objectives = LinOpVector()
         node_constraints = LinOpVector2D()
         #proximal_args = DataVector()
@@ -656,26 +656,30 @@ class TGraphVX(TUNGraph):
         # Create final node_list structure by adding on information for
         # node neighbors
         node_list = []
-        x_var_idx = IntVector2D();
-        x_var_sizes = IntVector2D();
+        x_var_idx = IntVector2D()
+        x_var_names = StringVector2D()
+        x_var_sizes = IntVector2D()
         neighbour_var_idx = IntVector3D();
         for nid, info in node_info.iteritems():
             entry = [nid, info[X_OBJ], info[X_VARS], info[X_CON], info[X_IND],\
                 info[X_LEN], info[X_DEG]]
             # Append information about z- and u-value indices for each
             # node neighbor
-            current_node_vars,current_node_vars_sizes = IntVector(),IntVector()
+            current_node_vars,current_node_vars_sizes,current_node_varnames = IntVector(),IntVector(),\
+                                                                                StringVector()
             current_node_edge_vars = IntVector2D()
             for (varID, varName, var, offset) in info[X_VARS]:
                 current_node_vars.push_back(node_vars_map[(varID,nid)])
+                current_node_varnames.push_back(varName)
                 current_node_vars_sizes.push_back(var.size[0])
-                current_edge_vars = IntVector();
+                current_edge_vars = IntVector()
                 for i in xrange(info[X_DEG]):
                     neighborId = info[X_NEIGHBORS][i]
                     current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
                 current_node_edge_vars.push_back(current_edge_vars)
             neighbour_var_idx.push_back(current_node_edge_vars)
             x_var_idx.push_back(current_node_vars)
+            x_var_names.push_back(current_node_varnames)
             x_var_sizes.push_back(current_node_vars_sizes)
             for i in xrange(info[X_DEG]):
                 neighborId = info[X_NEIGHBORS][i]
@@ -691,9 +695,9 @@ class TGraphVX(TUNGraph):
         #pool = multiprocessing.Pool(num_processors)
         
         #Don't hardcode these values you colossal fool!
-        ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,neighbour_var_idx,x_var_sizes,all_node_args)
-        ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
-        ADMM_obj.Solve()
+        self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
+        self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
+        self.ADMM_obj.Solve()
         """num_iterations = 0
         z_old = getValue(edge_z_vals, 0, z_length)
         # Proceed until convergence criteria are achieved or the maximum
@@ -804,7 +808,8 @@ class TGraphVX(TUNGraph):
 
     # Prints value of all node variables to console or file, if given
     def PrintSolution(self, Filename=None):
-        numpy.set_printoptions(linewidth=numpy.inf)
+        self.ADMM_obj.PrintSolution()
+        """numpy.set_printoptions(linewidth=numpy.inf)
         out = sys.stdout if (Filename == None) else open(Filename, 'w+')
 
         out.write('Status: %s\n' % self.status)
@@ -816,7 +821,7 @@ class TGraphVX(TUNGraph):
             for (varID, varName, var, offset) in self.node_variables[nid]:
                 val = numpy.transpose(self.GetNodeValue(nid, varName))
                 s = '  %s %s\n' % (varName, str(val))
-                out.write(s)
+                out.write(s)"""
 
     # Helper method to verify existence of an NId.
     def __VerifyNId(self, NId):

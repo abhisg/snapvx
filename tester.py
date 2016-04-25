@@ -56,5 +56,5 @@ if __name__ == '__main__':
 	start = time.time()
 	gvx.Solve(MaxIters=1)
 	print time.time() - start
-	#print gvx.PrintSolution()
+	print gvx.PrintSolution()
 
