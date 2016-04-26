@@ -1,5 +1,6 @@
-#include "ADMM.h"
+#include "ADMM.hpp"
 #include <iostream>
+#include <thread>
 
 ADMM::ADMM()
 {
@@ -87,13 +88,24 @@ void ADMM::Solve()
 {
 	//TODO : full implementation with convergence
 	for(int iter = 0 ; iter <= 10; ++iter){
+		std::vector<std::thread> threads_x;
+		std::vector<std::thread> threads_z;
+		std::vector<std::thread> threads_u;
 		for ( int i = 0 ; i < node_list.size(); ++i ){
-			ADMM_x(i);
+			//ADMM_x(i);
+			threads_x.push_back(std::thread(&ADMM::ADMM_x,this,i));
 		}
+		for ( auto&t : threads_x){t.join();}
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			ADMM_z(i);
-			ADMM_u(i);
+			//ADMM_z(i);
+			threads_z.push_back(std::thread(&ADMM::ADMM_z,this,i));
 		}
+		for ( auto&t : threads_z){t.join();}
+		for ( int i = 0 ; i < edge_list.size(); ++i ){
+			//ADMM_u(i);
+			threads_u.push_back(std::thread(&ADMM::ADMM_u,this,i));
+		}
+		for ( auto&t : threads_u){t.join();}
 	}
 }
 
@@ -159,8 +171,6 @@ void ADMM::ADMM_z(int i){
 														edge_u_vals[edge_list[i]->edge_var_idx[j].second])+
 												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first].value+
 										edge_u_vals[edge_list[i]->edge_var_idx[j].first]);
-							//std::cout << "z " << edge_list[i]->edge_var_idx[j].first << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
-							//std::cout << "z " << edge_list[i]->edge_var_idx[j].second << " " <<edge_z_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
 						}
 					}
 					break;
@@ -176,37 +186,9 @@ void ADMM::ADMM_u(int i){
 			edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first].value - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
 			edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second].value - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
 		}
-		//std::cout << "u " << edge_list[i]->edge_var_idx[j].first << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].first]<<"\n";
-                //std::cout << "u " << edge_list[i]->edge_var_idx[j].second << " " <<edge_u_vals[edge_list[i]->edge_var_idx[j].second]<<"\n";
 
 	}
 		
 }
 
-/*std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_node_x_vals()
-{
-	std::vector<std::map<int, Eigen::MatrixXd> > node_x;
-	for ( int i = 0 ; i < node_x_vals.size(); ++i ){
-		node_x.push_back(node_x_vals[i]->primal_values);
-	}
-	return node_x;
-}
-
-std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_edge_z_vals()
-{
-	std::vector<std::map<int, Eigen::MatrixXd> > edge_z;
-	for ( int i = 0 ; i < edge_z_vals.size(); ++i ){
-		edge_z.push_back(edge_z_vals[i]->primal_values);
-	}
-	return edge_z;
-}
-
-std::vector<std::map<int, Eigen::MatrixXd> > ADMM::get_edge_u_vals()
-{
-	std::vector<std::map<int, Eigen::MatrixXd> > edge_u;
-	for ( int i = 0 ; i < edge_u_vals.size(); ++i ){
-		edge_u.push_back(edge_u_vals[i]->primal_values);
-	}
-	return edge_u;
-}*/
 	

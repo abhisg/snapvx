@@ -2,7 +2,7 @@
 
 %{
         #define SWIG_FILE_WITH_INIT
-        #include "ADMM.h"
+        #include "ADMM.hpp"
         #include "CVXcanon/src/Solution.hpp"
         #include "CVXcanon/include/Eigen/Sparse"
         #include "CVXcanon/include/Eigen/Core"
@@ -13,7 +13,7 @@
 %include "std_map.i"
 %include "std_string.i"
 %include "std_pair.i"
-%include "ADMM.h"
+%include "ADMM.hpp"
 
 
 namespace std {

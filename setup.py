@@ -1,4 +1,11 @@
 from distutils.core import setup
+from subprocess import Popen
+import shlex
+
+#args = shlex.split('include/setup.py install')
+#process = Popen(args)
+#process.wait()
+
 setup(name='snapvx',
     version='0.2',
     #data_files=[('Examples', [
@@ -9,4 +16,5 @@ setup(name='snapvx',
     #    'Examples/LaplacianRegularization.py'])],
     py_modules=['snapvx']
     )
+
 

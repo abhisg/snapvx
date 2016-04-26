@@ -2,24 +2,20 @@
 
 from distutils.core import setup, Extension
 import os
+import subprocess
 
 os.environ['CXX'] = 'g++-4.8'
+cwd = os.path.dirname(os.path.realpath(__file__))
 
 ADMM_module = Extension('_ADMM',
-			sources = ['ADMM_wrap.cxx', 'ADMM.cpp','CVXcanon/src/CVXcanon.cpp','CVXcanon/src/BuildMatrix.cpp'
-				,'CVXcanon/src/EcosProblem.cpp','CVXcanon/src/LinOpOperations.cpp'],
-			include_dirs = ['CVXCanon/include/Eigen/','ecos/include','ecos/external/SuiteSparse_config'],
+			sources = [cwd+'/ADMM.i', cwd+'/ADMM.cpp',cwd+'/CVXcanon/src/CVXcanon.cpp',cwd+'/CVXcanon/src/BuildMatrix.cpp'
+				,cwd+'/CVXcanon/src/EcosProblem.cpp',cwd+'/CVXcanon/src/LinOpOperations.cpp'],
+			include_dirs = [cwd+'/CVXCanon/include/Eigen/',cwd+'/ecos/include',cwd+'/ecos/external/SuiteSparse_config'],
 			library_dirs = ['ecos'],
 			libraries = ['ecos'],
+			swig_opts = ['-c++','-I '+cwd+'/ADMM.i'],
+			extra_compile_args = ['-Wall','-O0','-pg','-std=c++11']
                            )
-"""ADMM_module = Extension('_ADMM',
-			sources = ['ADMM_wrap.cxx', 'ADMM.cpp','CVXcanon/src/CVXcanon.cpp','CVXcanon/src/EcosProblem.cpp',
-				'ecos/src/cone.c','ecos/src/ctrlc.c','ecos/src/ecos.c','ecos/src/equil.c','ecos/src/expcone.c',
-				'ecos/src/kkt.c','ecos/src/preproc.c',
-				'ecos/src/spla.c','ecos/src/splamm.c','ecos/src/timer.c','ecos/src/wright_omega.c'],
-			include_dirs = ['CVXCanon/include','ecos/include','ecos/external/SuiteSparse_config','ecos/external/ldl/include/','ecos/external/amd/include/'],
-			library_dirs = ['ecos'],
-                           )"""
 
 setup (name = 'ADMM',
        version = '0.1',
