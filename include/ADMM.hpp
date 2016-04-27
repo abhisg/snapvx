@@ -2,9 +2,10 @@
 #define ADMM_H
 
 #include "CVXcanon/src/CVXcanon.hpp"
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <utility>
+#include <unordered_map>
 
 typedef enum ProximalOperator
 {
@@ -50,9 +51,9 @@ class ADMM
 		std::vector<Edge *> edge_list;
 		
 		//update variables
-		std::map<int,Node_Var> node_x_vals;
-		std::map<int,Eigen::MatrixXd> edge_z_vals;
-		std::map<int,Eigen::MatrixXd> edge_u_vals;
+		std::unordered_map<int,Node_Var> node_x_vals;
+		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
+		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_edge_arg;
@@ -83,11 +84,11 @@ class ADMM
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
 		void Solve();
 		void PrintSolution();
-		/*std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();
-		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_z_vals();
-		std::vector<std::map<int, Eigen::MatrixXd> > get_edge_u_vals();*/
+		/*std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_node_x_vals();
+		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_z_vals();
+		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_u_vals();*/
 };
 
 #endif		
-//std::map<int,Solution> Solve(Sense sense, std::map<int,LinOp* objective> >,std::map<int,std::vector< LinOp* > constraints >);
+//std::unordered_map<int,Solution> Solve(Sense sense, std::unordered_map<int,LinOp* objective> >,std::unordered_map<int,std::vector< LinOp* > constraints >);
 

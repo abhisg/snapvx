@@ -144,7 +144,7 @@ def build_lin_op_tree(root_linPy, tmp):
     root_linC = CVXcanon.LinOp()
     Q.append((root_linPy, root_linC))
 
-    while len(Q) > 0:
+    while __builtin__.len(Q) > 0:
         linPy, linC = Q.popleft()
 
         # Updating the arguments our LinOp
@@ -515,10 +515,10 @@ class TGraphVX(TUNGraph):
                 sizes.append(var.size[0])
                 node_map_offset += 1
             proximal_args = DoubleVector2D()
-            for j in xrange(len(node_args)):
+            for j in xrange(__builtin__.len(node_args)):
                 argument = DoubleVector(sizes[j],0)
                 if node_args != []:
-                    for k in xrange(len(node_args[j])):
+                    for k in xrange(__builtin__.len(node_args[j])):
                         argument[k] = node_args[j][k]
                 proximal_args.push_back(argument)
             all_node_args.push_back(proximal_args)
@@ -637,21 +637,22 @@ class TGraphVX(TUNGraph):
         # of node variables, and n is the length of the stacked z vector of
         # edge variables.
         # Each row of A has one 1. There is a 1 at (i,j) if z_i = x_j.
-        A = lil_matrix((z_length, x_length), dtype=numpy.int8)
-        for ei in self.Edges():
-            etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
-            info_edge = edge_info[etup]
-            info_i = node_info[etup[0]]
-            info_j = node_info[etup[1]]
-            for offset in xrange(info_i[X_LEN]):
-                row = info_edge[Z_ZIJIND] + offset
-                col = info_i[X_IND] + offset
-                A[row, col] = 1
-            for offset in xrange(info_j[X_LEN]):
-                row = info_edge[Z_ZJIIND] + offset
-                col = info_j[X_IND] + offset
-                A[row, col] = 1
-        A_tr = A.transpose()
+        if not self.use_proximal_updates:
+            A = lil_matrix((z_length, x_length), dtype=numpy.int8)
+            for ei in self.Edges():
+                etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
+                info_edge = edge_info[etup]
+                info_i = node_info[etup[0]]
+                info_j = node_info[etup[1]]
+                for offset in xrange(info_i[X_LEN]):
+                    row = info_edge[Z_ZIJIND] + offset
+                    col = info_i[X_IND] + offset
+                    A[row, col] = 1
+                for offset in xrange(info_j[X_LEN]):
+                    row = info_edge[Z_ZJIIND] + offset
+                    col = info_j[X_IND] + offset
+                    A[row, col] = 1
+            A_tr = A.transpose()
 
         # Create final node_list structure by adding on information for
         # node neighbors
