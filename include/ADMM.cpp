@@ -94,7 +94,7 @@ void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::
 void ADMM::Solve()
 {
 	//TODO : full implementation with convergence
-	for(int iter = 0 ; iter <= 10; ++iter){
+	for(int iter = 0 ; iter <= 1000; ++iter){
 		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm.sum(),znorm.sum())) + 0.0001;
 		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm.sum()) + 0.0001;
 		for ( int i = 0 ; i < node_list.size(); ++i ){
@@ -107,6 +107,9 @@ void ADMM::Solve()
 			ADMM_u(i);
 		}
 		std::cout << sqrt(primal_res.sum()) << " " << e_pri << " " << sqrt(dual_res.sum()) << " " << e_dual << "\n";
+		if ( sqrt(primal_res.sum()) <= e_pri && sqrt(dual_res.sum()) <= e_dual ){
+			break;
+		}
 	}
 }
 

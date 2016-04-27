@@ -4,7 +4,8 @@ from distutils.core import setup, Extension
 import os
 import subprocess
 
-os.environ['CXX'] = 'g++-4.8'
+os.environ['CXX'] = 'g++'
+os.environ['CC'] = 'g++'
 cwd = os.path.dirname(os.path.realpath(__file__))
 
 ADMM_module = Extension('_ADMM',
@@ -14,7 +15,8 @@ ADMM_module = Extension('_ADMM',
 			library_dirs = ['ecos'],
 			libraries = ['ecos'],
 			swig_opts = ['-c++','-I '+cwd+'/ADMM.i'],
-			extra_compile_args = ['-Wall','-O0','-pg','-std=c++11']
+			extra_compile_args = ['-Wall','-O0','-pg','-std=c++0x'],
+			extra_link_args = ['-lrt'] #required for older glibc versions
                            )
 
 setup (name = 'ADMM',
