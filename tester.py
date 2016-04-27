@@ -3,9 +3,9 @@ from snapvx import *
 import numpy as np
 
 np.random.seed(1)
-num_nodes = 10
-num_edges = 30
-n = 10
+num_nodes = 3
+num_edges = 2
+n = 2
 snapGraph = GenRndGnm(PUNGraph, num_nodes, num_edges)
 gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 

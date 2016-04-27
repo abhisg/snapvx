@@ -8244,24 +8244,24 @@ SWIGINTERN PyObject *_wrap_ADMM_LoadNodesProximal(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   ADMM *arg1 = (ADMM *) 0 ;
   ProximalOperator arg2 ;
-  std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > arg3 ;
-  std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > arg4 ;
-  std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > arg5 ;
-  std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > arg6 ;
-  std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > arg7 ;
+  std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > *arg3 = 0 ;
+  std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > *arg4 = 0 ;
+  std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > *arg5 = 0 ;
+  std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > *arg6 = 0 ;
+  std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > *arg7 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int val2 ;
   int ecode2 = 0 ;
-  void *argp3 ;
+  void *argp3 = 0 ;
   int res3 = 0 ;
-  void *argp4 ;
+  void *argp4 = 0 ;
   int res4 = 0 ;
-  void *argp5 ;
+  void *argp5 = 0 ;
   int res5 = 0 ;
-  void *argp6 ;
+  void *argp6 = 0 ;
   int res6 = 0 ;
-  void *argp7 ;
+  void *argp7 = 0 ;
   int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8282,72 +8282,47 @@ SWIGINTERN PyObject *_wrap_ADMM_LoadNodesProximal(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ADMM_LoadNodesProximal" "', argument " "2"" of type '" "ProximalOperator""'");
   } 
   arg2 = static_cast< ProximalOperator >(val2);
-  {
-    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ADMM_LoadNodesProximal" "', argument " "3"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "3"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >""'");
-    } else {
-      std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * temp = reinterpret_cast< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ADMM_LoadNodesProximal" "', argument " "3"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > &""'"); 
   }
-  {
-    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_std__vectorT_std__vectorT_std__string_std__allocatorT_std__string_t_t_std__allocatorT_std__vectorT_std__string_std__allocatorT_std__string_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ADMM_LoadNodesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > >""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > >""'");
-    } else {
-      std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > * temp = reinterpret_cast< std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "3"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > &""'"); 
   }
-  {
-    res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_std__vectorT_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t_std__allocatorT_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res5)) {
-      SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ADMM_LoadNodesProximal" "', argument " "5"" of type '" "std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > >""'"); 
-    }  
-    if (!argp5) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "5"" of type '" "std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > >""'");
-    } else {
-      std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > * temp = reinterpret_cast< std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > * >(argp5);
-      arg5 = *temp;
-      if (SWIG_IsNewObj(res5)) delete temp;
-    }
+  arg3 = reinterpret_cast< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_std__vectorT_std__vectorT_std__string_std__allocatorT_std__string_t_t_std__allocatorT_std__vectorT_std__string_std__allocatorT_std__string_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ADMM_LoadNodesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > &""'"); 
   }
-  {
-    res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "ADMM_LoadNodesProximal" "', argument " "6"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >""'"); 
-    }  
-    if (!argp6) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "6"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >""'");
-    } else {
-      std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * temp = reinterpret_cast< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * >(argp6);
-      arg6 = *temp;
-      if (SWIG_IsNewObj(res6)) delete temp;
-    }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > &""'"); 
   }
-  {
-    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_std__vectorT_std__vectorT_std__vectorT_double_std__allocatorT_double_t_t_std__allocatorT_std__vectorT_double_std__allocatorT_double_t_t_t_t_std__allocatorT_std__vectorT_std__vectorT_double_std__allocatorT_double_t_t_std__allocatorT_std__vectorT_double_std__allocatorT_double_t_t_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res7)) {
-      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "ADMM_LoadNodesProximal" "', argument " "7"" of type '" "std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > >""'"); 
-    }  
-    if (!argp7) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "7"" of type '" "std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > >""'");
-    } else {
-      std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > * temp = reinterpret_cast< std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > * >(argp7);
-      arg7 = *temp;
-      if (SWIG_IsNewObj(res7)) delete temp;
-    }
+  arg4 = reinterpret_cast< std::vector< std::vector< std::string,std::allocator< std::string > >,std::allocator< std::vector< std::string,std::allocator< std::string > > > > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_std__vectorT_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t_std__allocatorT_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ADMM_LoadNodesProximal" "', argument " "5"" of type '" "std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > &""'"); 
   }
-  (arg1)->LoadNodesProximal(arg2,arg3,arg4,arg5,arg6,arg7);
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "5"" of type '" "std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > &""'"); 
+  }
+  arg5 = reinterpret_cast< std::vector< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > >,std::allocator< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > > > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_std__vectorT_std__vectorT_int_std__allocatorT_int_t_t_std__allocatorT_std__vectorT_int_std__allocatorT_int_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "ADMM_LoadNodesProximal" "', argument " "6"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "6"" of type '" "std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > &""'"); 
+  }
+  arg6 = reinterpret_cast< std::vector< std::vector< int,std::allocator< int > >,std::allocator< std::vector< int,std::allocator< int > > > > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_std__vectorT_std__vectorT_std__vectorT_double_std__allocatorT_double_t_t_std__allocatorT_std__vectorT_double_std__allocatorT_double_t_t_t_t_std__allocatorT_std__vectorT_std__vectorT_double_std__allocatorT_double_t_t_std__allocatorT_std__vectorT_double_std__allocatorT_double_t_t_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "ADMM_LoadNodesProximal" "', argument " "7"" of type '" "std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadNodesProximal" "', argument " "7"" of type '" "std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > &""'"); 
+  }
+  arg7 = reinterpret_cast< std::vector< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > >,std::allocator< std::vector< std::vector< double,std::allocator< double > >,std::allocator< std::vector< double,std::allocator< double > > > > > > * >(argp7);
+  (arg1)->LoadNodesProximal(arg2,*arg3,*arg4,*arg5,*arg6,*arg7);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8359,16 +8334,16 @@ SWIGINTERN PyObject *_wrap_ADMM_LoadEdgesProximal(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   ADMM *arg1 = (ADMM *) 0 ;
   ProximalOperator arg2 ;
-  std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > arg3 ;
-  std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > arg4 ;
+  std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > *arg3 = 0 ;
+  std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > *arg4 = 0 ;
   int arg5 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int val2 ;
   int ecode2 = 0 ;
-  void *argp3 ;
+  void *argp3 = 0 ;
   int res3 = 0 ;
-  void *argp4 ;
+  void *argp4 = 0 ;
   int res4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
@@ -8389,38 +8364,28 @@ SWIGINTERN PyObject *_wrap_ADMM_LoadEdgesProximal(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ADMM_LoadEdgesProximal" "', argument " "2"" of type '" "ProximalOperator""'");
   } 
   arg2 = static_cast< ProximalOperator >(val2);
-  {
-    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_std__vectorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_std__allocatorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ADMM_LoadEdgesProximal" "', argument " "3"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > >""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadEdgesProximal" "', argument " "3"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > >""'");
-    } else {
-      std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * temp = reinterpret_cast< std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_std__vectorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_std__allocatorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ADMM_LoadEdgesProximal" "', argument " "3"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > &""'"); 
   }
-  {
-    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_std__vectorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_std__allocatorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_t_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ADMM_LoadEdgesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > >""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadEdgesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > >""'");
-    } else {
-      std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * temp = reinterpret_cast< std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadEdgesProximal" "', argument " "3"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > &""'"); 
   }
+  arg3 = reinterpret_cast< std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_std__vectorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_std__allocatorT_std__vectorT_std__pairT_int_int_t_std__allocatorT_std__pairT_int_int_t_t_t_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ADMM_LoadEdgesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ADMM_LoadEdgesProximal" "', argument " "4"" of type '" "std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > &""'"); 
+  }
+  arg4 = reinterpret_cast< std::vector< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > >,std::allocator< std::vector< std::pair< int,int >,std::allocator< std::pair< int,int > > > > > * >(argp4);
   ecode5 = SWIG_AsVal_int(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "ADMM_LoadEdgesProximal" "', argument " "5"" of type '" "int""'");
   } 
   arg5 = static_cast< int >(val5);
-  (arg1)->LoadEdgesProximal(arg2,arg3,arg4,arg5);
+  (arg1)->LoadEdgesProximal(arg2,*arg3,*arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:

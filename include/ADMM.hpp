@@ -44,9 +44,12 @@ class ADMM
 		std::vector<LinOp* > edge_objectives;
 		std::vector<std::vector< LinOp *> > node_constraints;
 		std::vector<std::vector< LinOp *> > edge_constraints;*/
+
+		//list of nodes and edges for the problem
 		std::vector<Node *> node_list;
 		std::vector<Edge *> edge_list;
-		//std::map<int,Eigen::MatrixXd> node_x_vals;
+		
+		//update variables
 		std::map<int,Node_Var> node_x_vals;
 		std::map<int,Eigen::MatrixXd> edge_z_vals;
 		std::map<int,Eigen::MatrixXd> edge_u_vals;
@@ -54,6 +57,17 @@ class ADMM
 		ProximalOperator node_prox;
 		int prox_edge_arg;
 		std::map<std::string,double > solver_options;
+
+		//for convergence
+		Eigen::MatrixXd primal_res;
+		Eigen::MatrixXd dual_res;
+		Eigen::MatrixXd xnorm;
+		Eigen::MatrixXd znorm;
+		Eigen::MatrixXd unorm;
+		double size_x;
+		double size_z;
+
+		//solver functions
 		void ADMM_x(int);
 		void ADMM_z(int);
 		void ADMM_u(int);
@@ -64,9 +78,9 @@ class ADMM
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);*/
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> >,std::vector<std::vector<std::string> > x_var_names,
-					std::vector<std::vector<std::vector<int> > >,std::vector<std::vector<int> >,std::vector<std::vector<std::vector<double> > >);
-		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > >,std::vector<std::vector<std::pair<int,int> > >,int);
+		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> > &,std::vector<std::vector<std::string> > &,
+					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
+		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
 		void Solve();
 		void PrintSolution();
 		/*std::vector<std::map<int, Eigen::MatrixXd> > get_node_x_vals();

@@ -789,9 +789,9 @@ class TGraphVX(TUNGraph):
         res_dual = norm(s)
         if verbose:
             # Debugging information to print convergence criteria values
-            print '  r:', res_pri
+            print '  r:', res_pri,r
             print '  e_pri:', e_pri
-            print '  s:', res_dual
+            print '  s:', res_dual,s
             print '  e_dual:', e_dual
         stop = (res_pri <= e_pri) and (res_dual <= e_dual)
         return (stop, res_pri, e_pri, res_dual, e_dual)

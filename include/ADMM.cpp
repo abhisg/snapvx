@@ -38,11 +38,11 @@ void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 	}	
 }
 
-void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > x_var_idx,
-				std::vector<std::vector<std::string> > x_var_names,
-				std::vector<std::vector<std::vector<int> > > neighbour_var_idx,
-				std::vector<std::vector<int> > sizes,
-				std::vector<std::vector<std::vector<double> > > args)
+void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > &x_var_idx,
+				std::vector<std::vector<std::string> > &x_var_names,
+				std::vector<std::vector<std::vector<int> > > &neighbour_var_idx,
+				std::vector<std::vector<int> > &sizes,
+				std::vector<std::vector<std::vector<double> > > &args)
 {
 	//need zij and uij for all neighbours of i
 	node_prox = prox;
@@ -55,9 +55,11 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		newnode->args = std::vector<Eigen::MatrixXd>();
 		for ( int j = 0 ; j < x_var_idx[i].size(); ++j){
 			node_x_vals[x_var_idx[i][j]] = {Eigen::MatrixXd(sizes[i][j],1),x_var_names[i][j],i};
+			size_x += sizes[i][j];
 			for ( int k = 0 ; k < neighbour_var_idx[i][j].size(); ++k){
 				edge_u_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
 				edge_z_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
+				size_z += sizes[i][j];
 			}
 			Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[i][j],1);
 			for ( int k = 0 ; k < args[i][j].size(); ++k ){
@@ -67,9 +69,14 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		}
 		node_list.push_back(newnode);
 	}
+	primal_res = Eigen::MatrixXd(edge_z_vals.size(),1);
+	dual_res = Eigen::MatrixXd(edge_z_vals.size(),1);
+	xnorm = Eigen::MatrixXd(edge_z_vals.size(),1);
+	unorm = Eigen::MatrixXd(edge_z_vals.size(),1);
+	znorm =  Eigen::MatrixXd(edge_z_vals.size(),1);
 }
 
-void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > edge_var_idx,std::vector<std::vector<std::pair<int,int> > > node_var_idx,int arg=0)
+void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > &edge_var_idx,std::vector<std::vector<std::pair<int,int> > > &node_var_idx,int arg=0)
 {
 	//need xi and uij for all zij
 	edge_prox = prox;
@@ -88,24 +95,18 @@ void ADMM::Solve()
 {
 	//TODO : full implementation with convergence
 	for(int iter = 0 ; iter <= 10; ++iter){
-		std::vector<std::thread> threads_x;
-		std::vector<std::thread> threads_z;
-		std::vector<std::thread> threads_u;
+		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm.sum(),znorm.sum())) + 0.0001;
+		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm.sum()) + 0.0001;
 		for ( int i = 0 ; i < node_list.size(); ++i ){
-			//ADMM_x(i);
-			threads_x.push_back(std::thread(&ADMM::ADMM_x,this,i));
+			ADMM_x(i);
 		}
-		for ( auto&t : threads_x){t.join();}
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			//ADMM_z(i);
-			threads_z.push_back(std::thread(&ADMM::ADMM_z,this,i));
+			ADMM_z(i);
 		}
-		for ( auto&t : threads_z){t.join();}
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			//ADMM_u(i);
-			threads_u.push_back(std::thread(&ADMM::ADMM_u,this,i));
+			ADMM_u(i);
 		}
-		for ( auto&t : threads_u){t.join();}
+		std::cout << sqrt(primal_res.sum()) << " " << e_pri << " " << sqrt(dual_res.sum()) << " " << e_dual << "\n";
 	}
 }
 
@@ -163,6 +164,8 @@ void ADMM::ADMM_z(int i){
 										edge_u_vals[edge_list[i]->edge_var_idx[j].first]-
 										node_x_vals[edge_list[i]->node_var_idx[j].second].value-
 										edge_u_vals[edge_list[i]->edge_var_idx[j].second]).norm(),0.5);
+							Eigen::MatrixXd old_z_val_first = edge_z_vals[edge_list[i]->edge_var_idx[j].first];
+							Eigen::MatrixXd old_z_val_second = edge_z_vals[edge_list[i]->edge_var_idx[j].second];
 							edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first].value + 
 														edge_u_vals[edge_list[i]->edge_var_idx[j].first])+
 												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second].value+
@@ -171,6 +174,17 @@ void ADMM::ADMM_z(int i){
 														edge_u_vals[edge_list[i]->edge_var_idx[j].second])+
 												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].first].value+
 										edge_u_vals[edge_list[i]->edge_var_idx[j].first]);
+							primal_res(edge_list[i]->edge_var_idx[j].first,0) = (node_x_vals[edge_list[i]->node_var_idx[j].first].value - \
+													edge_z_vals[edge_list[i]->edge_var_idx[j].first]).squaredNorm();
+							primal_res(edge_list[i]->edge_var_idx[j].second,0) = (node_x_vals[edge_list[i]->node_var_idx[j].second].value - \
+													edge_z_vals[edge_list[i]->edge_var_idx[j].second]).squaredNorm();
+							dual_res(edge_list[i]->edge_var_idx[j].first,0) = (edge_z_vals[edge_list[i]->edge_var_idx[j].first] - old_z_val_first ).squaredNorm();
+							dual_res(edge_list[i]->edge_var_idx[j].second,0) = (edge_z_vals[edge_list[i]->edge_var_idx[j].second] - old_z_val_second).squaredNorm();
+							znorm(edge_list[i]->edge_var_idx[j].first,0) = edge_z_vals[edge_list[i]->edge_var_idx[j].first].squaredNorm();
+							znorm(edge_list[i]->edge_var_idx[j].second,0) = edge_z_vals[edge_list[i]->edge_var_idx[j].second].squaredNorm();
+							xnorm(edge_list[i]->edge_var_idx[j].first,0) = node_x_vals[edge_list[i]->node_var_idx[j].first].value.squaredNorm();
+							xnorm(edge_list[i]->edge_var_idx[j].second,0) = node_x_vals[edge_list[i]->node_var_idx[j].second].value.squaredNorm();
+							
 						}
 					}
 					break;
@@ -185,6 +199,8 @@ void ADMM::ADMM_u(int i){
 		if ( edge_list[i]->edge_var_idx[j].first != 0 || edge_list[i]->edge_var_idx[j].second != 0 ){
 			edge_u_vals[edge_list[i]->edge_var_idx[j].first] += node_x_vals[edge_list[i]->node_var_idx[j].first].value - edge_z_vals[edge_list[i]->edge_var_idx[j].first];
 			edge_u_vals[edge_list[i]->edge_var_idx[j].second] += node_x_vals[edge_list[i]->node_var_idx[j].second].value - edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+			unorm(edge_list[i]->edge_var_idx[j].first,0) = edge_u_vals[edge_list[i]->edge_var_idx[j].first].squaredNorm();
+			unorm(edge_list[i]->edge_var_idx[j].second,0) = edge_u_vals[edge_list[i]->edge_var_idx[j].second].squaredNorm();
 		}
 
 	}
