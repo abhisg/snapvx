@@ -51,12 +51,18 @@ class ADMM
 		std::vector<Edge *> edge_list;
 		
 		//update variables
-		std::unordered_map<int,Node_Var> node_x_vals;
+		/*std::unordered_map<int,Node_Var> node_x_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
-		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;
+		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;*/
+		Node_Var *node_x_vals;
+		Eigen::MatrixXd *edge_z_vals;
+		Eigen::MatrixXd *edge_u_vals;
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_edge_arg;
+		int x_var_size;
+		int z_var_size;
+
 		std::map<std::string,double > solver_options;
 
 		//for convergence

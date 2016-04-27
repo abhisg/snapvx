@@ -6,11 +6,16 @@ ADMM::ADMM()
 {
 	node_list.clear();
 	edge_list.clear();
-	node_x_vals.clear();
+	/*node_x_vals.clear();
 	edge_z_vals.clear();
-	edge_u_vals.clear();
+	edge_u_vals.clear();*/
+	node_x_vals = NULL;
+	edge_z_vals = NULL;
+	edge_u_vals = NULL;
 	edge_prox = NONE;
 	node_prox = NONE;
+	x_var_size = 0;
+	z_var_size = 0;
 	prox_edge_arg = 0;
 	solver_options = std::map<std::string,double>();
 }
@@ -46,6 +51,20 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 {
 	//need zij and uij for all neighbours of i
 	node_prox = prox;
+
+	//calculate the size required for the solution arrays
+	for ( int i = 0 ; i < x_var_idx.size(); ++i ){
+		x_var_size += x_var_idx[i].size();
+		for ( int j = 0 ; j < x_var_idx[i].size(); ++j ){
+			z_var_size += neighbour_var_idx[i][j].size();
+		}
+	}
+	std::cout << x_var_size << " " << z_var_size << "\n";
+	//declare the arrays
+	node_x_vals = new Node_Var[x_var_size];
+	edge_z_vals = new Eigen::MatrixXd[z_var_size];
+	edge_u_vals = new Eigen::MatrixXd[z_var_size];
+	
 	for ( int i = 0 ; i < x_var_idx.size(); ++i){
 		Node *newnode = new Node;
 		newnode->node_objective = NULL;
@@ -54,11 +73,11 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		newnode->x_var_idx = x_var_idx[i];
 		newnode->args = std::vector<Eigen::MatrixXd>();
 		for ( int j = 0 ; j < x_var_idx[i].size(); ++j){
-			node_x_vals[x_var_idx[i][j]] = {Eigen::MatrixXd(sizes[i][j],1),x_var_names[i][j],i};
+			node_x_vals[x_var_idx[i][j]] = {Eigen::MatrixXd::Constant(sizes[i][j],1,0),x_var_names[i][j],i};
 			size_x += sizes[i][j];
 			for ( int k = 0 ; k < neighbour_var_idx[i][j].size(); ++k){
-				edge_u_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
-				edge_z_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd(sizes[i][j],1);
+				edge_u_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd::Constant(sizes[i][j],1,0);
+				edge_z_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd::Constant(sizes[i][j],1,0);
 				size_z += sizes[i][j];
 			}
 			Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[i][j],1);
@@ -69,11 +88,11 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		}
 		node_list.push_back(newnode);
 	}
-	primal_res = Eigen::MatrixXd(edge_z_vals.size(),1);
-	dual_res = Eigen::MatrixXd(edge_z_vals.size(),1);
-	xnorm = Eigen::MatrixXd(edge_z_vals.size(),1);
-	unorm = Eigen::MatrixXd(edge_z_vals.size(),1);
-	znorm =  Eigen::MatrixXd(edge_z_vals.size(),1);
+	primal_res = Eigen::MatrixXd::Constant(z_var_size,1,0);
+	dual_res = Eigen::MatrixXd::Constant(z_var_size,1,0);
+	xnorm = Eigen::MatrixXd::Constant(z_var_size,1,0);
+	unorm = Eigen::MatrixXd::Constant(z_var_size,1,0);
+	znorm =  Eigen::MatrixXd::Constant(z_var_size,1,0);
 }
 
 void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > &edge_var_idx,std::vector<std::vector<std::pair<int,int> > > &node_var_idx,int arg=0)
@@ -123,7 +142,7 @@ void ADMM::Solve()
 
 void ADMM::PrintSolution()
 {
-	for(int i = 0 ; i < node_x_vals.size(); ++ i){
+	for(int i = 0 ; i < x_var_size; ++ i){
 		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
 	}
 }
@@ -145,7 +164,7 @@ void ADMM::ADMM_x(int i){
 							increment += edge_z_vals[node_list[i]->neighbour_var_idx[j][k]] - edge_u_vals[node_list[i]->neighbour_var_idx[j][k]];
 						}
 						node_x_vals[node_list[i]->x_var_idx[j]].value = increment*1.0/(2+node_list[i]->neighbour_var_idx[j].size());
-						//std::cout<<"x " << node_list[i]->x_var_idx[j]<<" "<<node_x_vals[node_list[i]->x_var_idx[j]]<<"\n";
+						//std::cout<<"x " << node_list[i]->x_var_idx[j] <<" "<<node_x_vals[node_list[i]->x_var_idx[j]].value<<"\n";
 					}
 					
 					break;
@@ -177,6 +196,7 @@ void ADMM::ADMM_z(int i){
 										edge_u_vals[edge_list[i]->edge_var_idx[j].second]).norm(),0.5);
 							Eigen::MatrixXd old_z_val_first = edge_z_vals[edge_list[i]->edge_var_idx[j].first];
 							Eigen::MatrixXd old_z_val_second = edge_z_vals[edge_list[i]->edge_var_idx[j].second];
+							//std::cout << " Old values " << edge_list[i]->edge_var_idx[j].first << " " << old_z_val_first << " " << edge_list[i]->edge_var_idx[j].second << " " << old_z_val_second << "\n";
 							edge_z_vals[edge_list[i]->edge_var_idx[j].first] = theta * (node_x_vals[edge_list[i]->node_var_idx[j].first].value + 
 														edge_u_vals[edge_list[i]->edge_var_idx[j].first])+
 												(1-theta) * (node_x_vals[edge_list[i]->node_var_idx[j].second].value+
