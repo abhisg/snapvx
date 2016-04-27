@@ -93,16 +93,24 @@ void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::
 
 void ADMM::Solve()
 {
-	//TODO : full implementation with convergence
 	for(int iter = 0 ; iter <= 1000; ++iter){
 		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm.sum(),znorm.sum())) + 0.0001;
 		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm.sum()) + 0.0001;
+		#if defined(_OPENMP)
+			#pragma omp for schedule(dynamic, 10)
+		#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
 			ADMM_x(i);
 		}
+		#if defined(_OPENMP)
+			#pragma omp for schedule(dynamic, 10)
+		#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_z(i);
 		}
+		#if defined(_OPENMP)
+			#pragma omp for schedule(dynamic, 10)
+		#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_u(i);
 		}

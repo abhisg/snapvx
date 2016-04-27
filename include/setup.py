@@ -15,8 +15,8 @@ ADMM_module = Extension('_ADMM',
 			library_dirs = ['ecos'],
 			libraries = ['ecos'],
 			swig_opts = ['-c++','-I '+cwd+'/ADMM.i'],
-			extra_compile_args = ['-Wall','-O0','-pg','-std=c++0x'],
-			extra_link_args = ['-lrt'] #required for older glibc versions
+			extra_compile_args = ['-Wall','-O0','-pg','-std=c++0x', '-fopenmp'],
+			extra_link_args = ['-lrt','-lgomp'] #required for older glibc versions
                            )
 
 setup (name = 'ADMM',
