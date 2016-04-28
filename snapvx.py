@@ -34,6 +34,7 @@ import scipy
 from scipy.sparse import lil_matrix
 import sys
 import time
+import line_profiler
 import __builtin__
 
 # File format: One edge per line, written as "srcID dstID"
@@ -477,6 +478,7 @@ class TGraphVX(TUNGraph):
     # Implementation of distributed ADMM
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
+    #@profile
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
                     verbose, UseSlowADMM):
         global node_vals, edge_z_vals, edge_u_vals, rho
@@ -635,7 +637,7 @@ class TGraphVX(TUNGraph):
         # of node variables, and n is the length of the stacked z vector of
         # edge variables.
         # Each row of A has one 1. There is a 1 at (i,j) if z_i = x_j.
-        if not UseSlowADMM:
+        if UseSlowADMM == False:
             A = lil_matrix((z_length, x_length), dtype=numpy.int8)
             for ei in self.Edges():
                 etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
