@@ -637,7 +637,7 @@ class TGraphVX(TUNGraph):
         # of node variables, and n is the length of the stacked z vector of
         # edge variables.
         # Each row of A has one 1. There is a 1 at (i,j) if z_i = x_j.
-        if not UseSlowADMM:
+        if UseSlowADMM == False:
             A = lil_matrix((z_length, x_length), dtype=numpy.int8)
             for ei in self.Edges():
                 etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())

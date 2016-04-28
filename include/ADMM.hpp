@@ -66,18 +66,23 @@ class ADMM
 		std::map<std::string,double > solver_options;
 
 		//for convergence
-		Eigen::MatrixXd primal_res;
+		/*Eigen::MatrixXd primal_res;
 		Eigen::MatrixXd dual_res;
 		Eigen::MatrixXd xnorm;
 		Eigen::MatrixXd znorm;
-		Eigen::MatrixXd unorm;
+		Eigen::MatrixXd unorm;*/
+		double primal_res;
+		double dual_res;
+		double xnorm;
+		double znorm;
+		double unorm;
 		double size_x;
 		double size_z;
 
 		//solver functions
-		void ADMM_x(int);
-		void ADMM_z(int);
-		void ADMM_u(int);
+		void ADMM_x(Node *);
+		void ADMM_z(Edge *);
+		void ADMM_u(Edge *);
 		//void copyLinop(LinOp* const&,LinOp* const&);
 	public:
 		ADMM();

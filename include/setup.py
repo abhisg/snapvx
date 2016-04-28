@@ -4,8 +4,8 @@ from distutils.core import setup, Extension
 import os
 import subprocess
 
-os.environ['CXX'] = 'g++'
-os.environ['CC'] = 'g++'
+os.environ['CXX'] = '/opt/rh/devtoolset-2/root/usr/bin/g++'
+os.environ['CC'] = '/opt/rh/devtoolset-2/root/usr/bin/g++'
 cwd = os.path.dirname(os.path.realpath(__file__))
 
 ADMM_module = Extension('_ADMM',
