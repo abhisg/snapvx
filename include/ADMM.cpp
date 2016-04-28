@@ -6,9 +6,9 @@ ADMM::ADMM()
 {
 	node_list.clear();
 	edge_list.clear();
-	node_x_vals = NULL;
-	edge_z_vals = NULL;
-	edge_u_vals = NULL;
+	node_x_vals.clear();
+	edge_z_vals.clear();
+	edge_u_vals.clear();
 	edge_prox = NONE;
 	node_prox = NONE;
 	x_var_size = 0;
@@ -57,9 +57,9 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		}
 	}
 	//declare the arrays
-	node_x_vals = new Node_Var[x_var_size];
-	edge_z_vals = new Eigen::MatrixXd[z_var_size];
-	edge_u_vals = new Eigen::MatrixXd[z_var_size];
+	node_x_vals.resize(x_var_size);// = new Node_Var[x_var_size];
+	edge_z_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
+	edge_u_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
 	
 	for ( int i = 0 ; i < x_var_idx.size(); ++i){
 		Node *newnode = new Node;
@@ -118,7 +118,7 @@ void ADMM::Solve()
 		znorm = 0;
 		std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 		//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 2048)
+			#pragma omp parallel for schedule(dynamic, 8)
 		//#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
 			ADMM_x(node_list[i]);
@@ -126,21 +126,22 @@ void ADMM::Solve()
 		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in x = " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<std::endl;
 		//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 2048)
+			#pragma omp parallel for schedule(dynamic, 16)
 		//#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_z(edge_list[i]);
+			//ADMM_u(edge_list[i]);
 		}
 		std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
-		std::cout << "Time difference in z = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
-		//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 2048)
+		std::cout << "Time difference in z and u = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
+		/*//#if defined(_OPENMP)
+			#pragma omp parallel for schedule(dynamic, 2)
 		//#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_u(edge_list[i]);
 		}
 		std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
-		std::cout << "Time difference in u = " << std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count() <<std::endl;
+		std::cout << "Time difference in u = " << std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count() <<std::endl;*/
 		std::cout << sqrt(primal_res) << " " << e_pri << " " << sqrt(dual_res) << " " << e_dual << "\n";
 		if ( sqrt(primal_res) <= e_pri && sqrt(dual_res) <= e_dual ){
 			break;
@@ -208,11 +209,18 @@ void ADMM::ADMM_z(Edge *edge){
 							Eigen::MatrixXd sum_i = (x_i + u_ij),sum_j = (x_j + u_ji);
 							edge_z_vals[edge->edge_var_idx[j].first] = theta * sum_i + (1-theta) * sum_j;
 							edge_z_vals[edge->edge_var_idx[j].second] = ( 1- theta ) * sum_i + theta * sum_j;
-							primal_res += (x_i - z_ij).squaredNorm() + (x_j - z_ji).squaredNorm();
-							dual_res += (edge_z_vals[edge->edge_var_idx[j].first] - z_ij ).squaredNorm()+
-									(edge_z_vals[edge->edge_var_idx[j].second] - z_ji).squaredNorm();
-							znorm +=  edge_z_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_z_vals[edge->edge_var_idx[j].second].squaredNorm();
-							xnorm += x_i.squaredNorm() +  x_j.squaredNorm();	
+							edge_u_vals[edge->edge_var_idx[j].first] += x_i - edge_z_vals[edge->edge_var_idx[j].first];
+							edge_u_vals[edge->edge_var_idx[j].second] += x_j - edge_z_vals[edge->edge_var_idx[j].second];
+							
+							#pragma omp critical
+							{	
+								primal_res += (x_i - z_ij).squaredNorm() + (x_j - z_ji).squaredNorm();
+								dual_res += (edge_z_vals[edge->edge_var_idx[j].first] - z_ij ).squaredNorm()+
+										(edge_z_vals[edge->edge_var_idx[j].second] - z_ji).squaredNorm();
+								znorm +=  edge_z_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_z_vals[edge->edge_var_idx[j].second].squaredNorm();
+								xnorm += x_i.squaredNorm() +  x_j.squaredNorm();	
+								unorm += edge_u_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_u_vals[edge->edge_var_idx[j].second].squaredNorm();
+							}
 						}
 					}
 					break;
@@ -227,7 +235,7 @@ void ADMM::ADMM_u(Edge *edge){
 		if ( edge->edge_var_idx[j].first != 0 || edge->edge_var_idx[j].second != 0 ){
 			edge_u_vals[edge->edge_var_idx[j].first] += node_x_vals[edge->node_var_idx[j].first].value - edge_z_vals[edge->edge_var_idx[j].first];
 			edge_u_vals[edge->edge_var_idx[j].second] += node_x_vals[edge->node_var_idx[j].second].value - edge_z_vals[edge->edge_var_idx[j].second];
-			#pragma atomic update
+			#pragma omp atomic update
 			unorm += edge_u_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_u_vals[edge->edge_var_idx[j].second].squaredNorm();
 		}
 

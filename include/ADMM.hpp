@@ -54,9 +54,9 @@ class ADMM
 		/*std::unordered_map<int,Node_Var> node_x_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;*/
-		Node_Var *node_x_vals;
-		Eigen::MatrixXd *edge_z_vals;
-		Eigen::MatrixXd *edge_u_vals;
+		std::vector<Node_Var> node_x_vals;
+		std::vector<Eigen::MatrixXd> edge_z_vals;
+		std::vector<Eigen::MatrixXd> edge_u_vals;
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_edge_arg;
