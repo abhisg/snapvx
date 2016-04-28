@@ -311,7 +311,7 @@ class TGraphVX(TUNGraph):
     # maxIters optional parameter: Maximum iterations for distributed ADMM.
     def Solve(self, M=Minimize, UseADMM=True, NumProcessors=0, Rho=1.0,
               MaxIters=250, EpsAbs=0.01, EpsRel=0.01, Verbose=False, 
-              UseClustering = False, ClusterSize = 1000):
+              UseClustering = False, ClusterSize = 1000, UseSlowADMM = False):
         global m_func
         m_func = M
 
@@ -321,11 +321,11 @@ class TGraphVX(TUNGraph):
         if UseClustering and ClusterSize > 0:
             SuperNodes = self.__ClusterGraph(ClusterSize)
             self.__SolveClusterADMM(M,UseADMM,SuperNodes, NumProcessors, Rho, MaxIters,\
-                                     EpsAbs, EpsRel, Verbose)
+                                     EpsAbs, EpsRel, Verbose )
             return
         if UseADMM and self.GetEdges() != 0:
             self.__SolveADMM(NumProcessors, Rho, MaxIters, EpsAbs, EpsRel,
-                             Verbose)
+                             Verbose, UseSlowADMM)
             return
         if Verbose:
             print 'Serial ADMM'
@@ -478,7 +478,7 @@ class TGraphVX(TUNGraph):
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
-                    verbose):
+                    verbose, UseSlowADMM):
         global node_vals, edge_z_vals, edge_u_vals, rho
         global getValue, rho_update_func
 
@@ -530,8 +530,6 @@ class TGraphVX(TUNGraph):
                 etup = self.__GetEdgeTup(nid, neighborId)
                 econ = self.edge_constraints[etup]
                 con += econ
-                #for (varID, varName, var, offset) in variables:
-                #    norms += square(norm(var-numpy.zeros((var.size[0],1))))
             """prob = Problem(m_func(obj+norms),con)
             obj_canon,cons_canon = prob.canonicalize()
             print obj_canon,cons_canon
@@ -593,11 +591,11 @@ class TGraphVX(TUNGraph):
             for (varID, varName, var, offset) in info_i[X_VARS]:
                     edge_vars_map[(varID,etup[0],etup[1])] = edge_map_offset
                     edge_map_offset += 1
-                    norms += square(norm(var))
+                    #norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
                     edge_vars_map[(varID,etup[1],etup[0])] = edge_map_offset
                     edge_map_offset += 1
-                    norms += square(norm(var))
+                    #norms += square(norm(var))
             edge_proximal_args = self.edge_proximalArgs[etup]
             for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
                 for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
@@ -637,7 +635,7 @@ class TGraphVX(TUNGraph):
         # of node variables, and n is the length of the stacked z vector of
         # edge variables.
         # Each row of A has one 1. There is a 1 at (i,j) if z_i = x_j.
-        if not self.use_proximal_updates:
+        if not UseSlowADMM:
             A = lil_matrix((z_length, x_length), dtype=numpy.int8)
             for ei in self.Edges():
                 etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
@@ -690,66 +688,64 @@ class TGraphVX(TUNGraph):
                 entry.append(einfo[indices[0]])
                 entry.append(einfo[indices[1]])
             node_list.append(entry)
-        #if __name__ == '__main__':
-        #print __name__
-        #multiprocessing.freeze_support()
-        #pool = multiprocessing.Pool(num_processors)
         
         #Don't hardcode these values you colossal fool!
         self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
         self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         self.ADMM_obj.Solve()
-        """num_iterations = 0
-        z_old = getValue(edge_z_vals, 0, z_length)
-        # Proceed until convergence criteria are achieved or the maximum
-        # number of iterations has passed
-        while num_iterations <= maxIters:
-            # Check convergence criteria
-            if num_iterations != 0:
-                x = getValue(node_vals, 0, x_length)
-                z = getValue(edge_z_vals, 0, z_length)
-                u = getValue(edge_u_vals, 0, z_length)
-                # Determine if algorithm should stop. Retrieve primal and dual
-                # residuals and thresholds
-                stop, res_pri, e_pri, res_dual, e_dual =\
-                    self.__CheckConvergence(A, A_tr, x, z, z_old, u, rho,\
+        if UseSlowADMM == True:
+            pool = multiprocessing.Pool(num_processors)
+            num_iterations = 0
+            z_old = getValue(edge_z_vals, 0, z_length)
+            # Proceed until convergence criteria are achieved or the maximum
+            # number of iterations has passed
+            while num_iterations <= maxIters:
+                # Check convergence criteria
+                if num_iterations != 0:
+                    x = getValue(node_vals, 0, x_length)
+                    z = getValue(edge_z_vals, 0, z_length)
+                    u = getValue(edge_u_vals, 0, z_length)
+                    # Determine if algorithm should stop. Retrieve primal and dual
+                    # residuals and thresholds
+                    stop, res_pri, e_pri, res_dual, e_dual =\
+                        self.__CheckConvergence(A, A_tr, x, z, z_old, u, rho,\
                                             x_length, z_length,
                                             eps_abs, eps_rel, verbose)
-                if stop: break
-                z_old = z
-                # Update rho and scale u-values
-                rho_new = rho_update_func(rho, res_pri, e_pri, res_dual, e_dual)
-                scale = float(rho) / rho_new
-                edge_u_vals[:] = [i * scale for i in edge_u_vals]
-                rho = rho_new
-            num_iterations += 1
+                    if stop: break
+                    z_old = z
+                    # Update rho and scale u-values
+                    rho_new = rho_update_func(rho, res_pri, e_pri, res_dual, e_dual)
+                    scale = float(rho) / rho_new
+                    edge_u_vals[:] = [i * scale for i in edge_u_vals]
+                    rho = rho_new
+                num_iterations += 1
 
-            if verbose:
-                # Debugging information prints current iteration #
-                print 'Iteration %d' % num_iterations
-            #if os.name != 'nt':
-            #    pool.map(ADMM_x, node_list)
-            #    pool.map(ADMM_z, edge_list)
-            #    pool.map(ADMM_u, edge_list)
-            #else:
-            map(ADMM_x, node_list)
-            map(ADMM_z, edge_list)
-            map(ADMM_u, edge_list)
-        #pool.close()
-        #pool.join()
+                if verbose:
+                    # Debugging information prints current iteration #
+                    print 'Iteration %d' % num_iterations
+                if os.name != 'nt':
+                    pool.map(ADMM_x, node_list)
+                    pool.map(ADMM_z, edge_list)
+                    pool.map(ADMM_u, edge_list)
+                else:
+                    map(ADMM_x, node_list)
+                    map(ADMM_z, edge_list)
+                    map(ADMM_u, edge_list)
+                pool.close()
+                pool.join()
 
-        # Insert into hash to support GetNodeValue()
-        for entry in node_list:
-            nid = entry[X_NID]
-            index = entry[X_IND]
-            size = entry[X_LEN]
-            self.node_values[nid] = getValue(node_vals, index, size)
-        # Set TGraphVX status and value to match CVXPY
-        if num_iterations <= maxIters:
-            self.status = 'Optimal'
-        else:
-            self.status = 'Incomplete: max iterations reached'
-        self.value = self.GetTotalProblemValue()"""
+            # Insert into hash to support GetNodeValue()
+            for entry in node_list:
+                nid = entry[X_NID]
+                index = entry[X_IND]
+                size = entry[X_LEN]
+                self.node_values[nid] = getValue(node_vals, index, size)
+            # Set TGraphVX status and value to match CVXPY
+            if num_iterations <= maxIters:
+                self.status = 'Optimal'
+            else:
+                self.status = 'Incomplete: max iterations reached'
+            self.value = self.GetTotalProblemValue()
     
     # Iterate through all variables and update values.
     # Sum all objective values over all nodes and edges.

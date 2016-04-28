@@ -6,9 +6,6 @@ ADMM::ADMM()
 {
 	node_list.clear();
 	edge_list.clear();
-	/*node_x_vals.clear();
-	edge_z_vals.clear();
-	edge_u_vals.clear();*/
 	node_x_vals = NULL;
 	edge_z_vals = NULL;
 	edge_u_vals = NULL;
@@ -59,7 +56,6 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 			z_var_size += neighbour_var_idx[i][j].size();
 		}
 	}
-	std::cout << x_var_size << " " << z_var_size << "\n";
 	//declare the arrays
 	node_x_vals = new Node_Var[x_var_size];
 	edge_z_vals = new Eigen::MatrixXd[z_var_size];
@@ -116,19 +112,19 @@ void ADMM::Solve()
 		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm.sum(),znorm.sum())) + 0.0001;
 		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm.sum()) + 0.0001;
 		#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 10)
+			#pragma omp parallel for schedule(static, 4096)
 		#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
 			ADMM_x(i);
 		}
 		#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 10)
+			#pragma omp parallel for schedule(static, 4096)
 		#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_z(i);
 		}
 		#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 10)
+			#pragma omp parallel for schedule(static, 4096)
 		#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_u(i);
@@ -178,7 +174,6 @@ void ADMM::ADMM_x(int i){
 
 void ADMM::ADMM_z(int i){
 	//TODO : change the rho of the objective
-	//*edge_z_vals[i] = solve(MINIMIZE,edge_objectives[i],edge_constraints[i],solver_options);
 	if ( edge_list[i]->edge_objective != NULL ){
 		Solution soln = solve(MINIMIZE,edge_list[i]->edge_objective,edge_list[i]->edge_constraints,solver_options);
 		//yank out variables,update the eigen matrices
