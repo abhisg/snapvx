@@ -125,7 +125,7 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 	znorm =  Eigen::MatrixXd::Constant(z_var_size,1,0);*/
 }
 
-void ADMM::LoadEdgeProximal(ProximalOperator prox,std::vector<std::pair<int,int> > &edge_var_idx,std::vector<std::pair<int,int> > &node_var_idx,int arg=0)
+void ADMM::LoadEdgeProximal(ProximalOperator prox,std::vector<std::vector<int> > &edge_var_idx,std::vector<std::vector<int> > &node_var_idx,int arg=0)
 {
 	//need xi and uij for all zij
 	edge_prox = prox;
@@ -139,7 +139,7 @@ void ADMM::LoadEdgeProximal(ProximalOperator prox,std::vector<std::pair<int,int>
 }
 
 //for bulk loading of edges
-void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > &edge_var_idx,std::vector<std::vector<std::pair<int,int> > > &node_var_idx,int arg=0)
+void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::vector<int> > > &edge_var_idx,std::vector<std::vector<std::vector<int> > > &node_var_idx,int arg=0)
 {
 	//need xi and uij for all zij
 	edge_prox = prox;
@@ -236,29 +236,29 @@ void ADMM::ADMM_edge(Edge *edge){
 					break;
 			case LASSO:	//std::cout << "yada yada z\n";
 					for ( int j = 0 ; j < edge->edge_var_idx.size(); ++j ){
-						if ( edge->edge_var_idx[j].first != 0 || edge->edge_var_idx[j].second != 0 ){
-							Eigen::MatrixXd z_ij = edge_z_vals[edge->edge_var_idx[j].first];
-							Eigen::MatrixXd z_ji = edge_z_vals[edge->edge_var_idx[j].second];
-							Eigen::MatrixXd u_ij = edge_u_vals[edge->edge_var_idx[j].first];
-							Eigen::MatrixXd u_ji = edge_u_vals[edge->edge_var_idx[j].second];
-							Eigen::MatrixXd x_i = node_x_vals[edge->node_var_idx[j].first].value;
-							Eigen::MatrixXd x_j = node_x_vals[edge->node_var_idx[j].second].value;
+						if ( edge->edge_var_idx[j][0] != 0 || edge->edge_var_idx[j][1] != 0 ){
+							Eigen::MatrixXd z_ij = edge_z_vals[edge->edge_var_idx[j][0]];
+							Eigen::MatrixXd z_ji = edge_z_vals[edge->edge_var_idx[j][1]];
+							Eigen::MatrixXd u_ij = edge_u_vals[edge->edge_var_idx[j][0]];
+							Eigen::MatrixXd u_ji = edge_u_vals[edge->edge_var_idx[j][1]];
+							Eigen::MatrixXd x_i = node_x_vals[edge->node_var_idx[j][0]].value;
+							Eigen::MatrixXd x_j = node_x_vals[edge->node_var_idx[j][1]].value;
 							double theta = std::max(1-1.0/(x_i+u_ij - x_j - u_ji).norm(),0.5);
 							//std::cout << " Old values " << edge_list[i]->edge_var_idx[j].first << " " << old_z_val_first << " " << edge_list[i]->edge_var_idx[j].second << " " << old_z_val_second << "\n";
 							Eigen::MatrixXd sum_i = (x_i + u_ij),sum_j = (x_j + u_ji);
-							edge_z_vals[edge->edge_var_idx[j].first] = theta * sum_i + (1-theta) * sum_j;
-							edge_z_vals[edge->edge_var_idx[j].second] = ( 1- theta ) * sum_i + theta * sum_j;
-							edge_u_vals[edge->edge_var_idx[j].first] += x_i - edge_z_vals[edge->edge_var_idx[j].first];
-							edge_u_vals[edge->edge_var_idx[j].second] += x_j - edge_z_vals[edge->edge_var_idx[j].second];
+							edge_z_vals[edge->edge_var_idx[j][0]] = theta * sum_i + (1-theta) * sum_j;
+							edge_z_vals[edge->edge_var_idx[j][1]] = ( 1- theta ) * sum_i + theta * sum_j;
+							edge_u_vals[edge->edge_var_idx[j][0]] += x_i - edge_z_vals[edge->edge_var_idx[j][0]];
+							edge_u_vals[edge->edge_var_idx[j][1]] += x_j - edge_z_vals[edge->edge_var_idx[j][1]];
 							
 							#pragma omp critical
 							{	
 								primal_res += (x_i - z_ij).squaredNorm() + (x_j - z_ji).squaredNorm();
-								dual_res += (edge_z_vals[edge->edge_var_idx[j].first] - z_ij ).squaredNorm()+
-										(edge_z_vals[edge->edge_var_idx[j].second] - z_ji).squaredNorm();
-								znorm +=  edge_z_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_z_vals[edge->edge_var_idx[j].second].squaredNorm();
+								dual_res += (edge_z_vals[edge->edge_var_idx[j][0]] - z_ij ).squaredNorm()+
+										(edge_z_vals[edge->edge_var_idx[j][1]] - z_ji).squaredNorm();
+								znorm +=  edge_z_vals[edge->edge_var_idx[j][0]].squaredNorm() + edge_z_vals[edge->edge_var_idx[j][1]].squaredNorm();
 								xnorm += x_i.squaredNorm() +  x_j.squaredNorm();	
-								unorm += edge_u_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_u_vals[edge->edge_var_idx[j].second].squaredNorm();
+								unorm += edge_u_vals[edge->edge_var_idx[j][0]].squaredNorm() + edge_u_vals[edge->edge_var_idx[j][1]].squaredNorm();
 							}
 						}
 					}
