@@ -51,12 +51,12 @@ class ADMM
 		std::vector<Edge *> edge_list;
 		
 		//update variables
-		/*std::unordered_map<int,Node_Var> node_x_vals;
+		std::unordered_map<int,Node_Var> node_x_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
-		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;*/
-		std::vector<Node_Var> node_x_vals;
+		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;
+		/*std::vector<Node_Var> node_x_vals;
 		std::vector<Eigen::MatrixXd> edge_z_vals;
-		std::vector<Eigen::MatrixXd> edge_u_vals;
+		std::vector<Eigen::MatrixXd> edge_u_vals;*/
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_edge_arg;
@@ -80,9 +80,8 @@ class ADMM
 		double size_z;
 
 		//solver functions
-		void ADMM_x(Node *);
-		void ADMM_z(Edge *);
-		void ADMM_u(Edge *);
+		void ADMM_node(Node *);
+		void ADMM_edge(Edge *);
 		//void copyLinop(LinOp* const&,LinOp* const&);
 	public:
 		ADMM();
@@ -93,6 +92,8 @@ class ADMM
 		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> > &,std::vector<std::vector<std::string> > &,
 					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
+		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::vector<double> >  &);
+		void LoadEdgeProximal(ProximalOperator,std::vector<std::pair<int,int> >  &,std::vector<std::pair<int,int> >  &,int);
 		void Solve();
 		void PrintSolution();
 		/*std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_node_x_vals();

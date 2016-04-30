@@ -502,7 +502,7 @@ class TGraphVX(TUNGraph):
         length = 0
         node_vars_map,node_map_offset = {},0
         #node_args = DataVector()
-        all_node_args = DoubleVector3D()
+        #all_node_args = DoubleVector3D()
         for ni in self.Nodes():
             nid = ni.GetId()
             deg = ni.GetDeg()
@@ -517,13 +517,13 @@ class TGraphVX(TUNGraph):
                 sizes.append(var.size[0])
                 node_map_offset += 1
             proximal_args = DoubleVector2D()
-            for j in xrange(__builtin__.len(node_args)):
+            """for j in xrange(__builtin__.len(node_args)):
                 argument = DoubleVector(sizes[j],0)
                 if node_args != []:
                     for k in xrange(__builtin__.len(node_args[j])):
                         argument[k] = node_args[j][k]
-                proximal_args.push_back(argument)
-            all_node_args.push_back(proximal_args)
+                proximal_args.push_back(argument)"""
+            #all_node_args.push_back(proximal_args)
             con = self.node_constraints[nid]
             neighbors = [ni.GetNbrNId(j) for j in xrange(deg)]
             norms = 0
@@ -608,8 +608,9 @@ class TGraphVX(TUNGraph):
                         pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
                                      edge_vars_map[(j_varID,etup[1],etup[0])])
                         current_edge_var_idx.push_back(pair_edge)
-            node_var_idx.push_back(current_node_var_idx)
-            edge_var_idx.push_back(current_edge_var_idx)
+            #node_var_idx.push_back(current_node_var_idx)
+            #edge_var_idx.push_back(current_edge_var_idx)
+            self.ADMM_obj.LoadEdgeProximal(LASSO,current_edge_var_idx,current_node_var_idx,0)
             """obj_canon,cons_canon = Problem(m_func(obj+norms),con).canonicalize()
             tmp = []
             edge_objectives.push_back(build_lin_op_tree(obj_canon,tmp))
@@ -669,6 +670,9 @@ class TGraphVX(TUNGraph):
             current_node_vars,current_node_vars_sizes,current_node_varnames = IntVector(),IntVector(),\
                                                                                 StringVector()
             current_node_edge_vars = IntVector2D()
+            node_args = self.node_proximalArgs[nid]
+            if node_args is None:
+                node_args = [[] for (varID, varName, var, offset) in variables]
             for (varID, varName, var, offset) in info[X_VARS]:
                 current_node_vars.push_back(node_vars_map[(varID,nid)])
                 current_node_varnames.push_back(varName)
@@ -678,10 +682,22 @@ class TGraphVX(TUNGraph):
                     neighborId = info[X_NEIGHBORS][i]
                     current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
                 current_node_edge_vars.push_back(current_edge_vars)
-            neighbour_var_idx.push_back(current_node_edge_vars)
-            x_var_idx.push_back(current_node_vars)
-            x_var_names.push_back(current_node_varnames)
-            x_var_sizes.push_back(current_node_vars_sizes)
+            proximal_args = DoubleVector2D()
+            for j in xrange(__builtin__.len(node_args)):
+                argument = DoubleVector(sizes[j],0)
+                if node_args != []:
+                    for k in xrange(__builtin__.len(node_args[j])):
+                        argument[k] = node_args[j][k]
+                proximal_args.push_back(argument)
+            self.ADMM_obj.LoadNodeProximal(SQUARE,current_node_vars\
+                                           ,current_node_varnames\
+                                           ,current_node_edge_vars\
+                                           ,current_node_vars_sizes\
+                                           ,proximal_args)
+            #neighbour_var_idx.push_back(current_node_edge_vars)
+            #x_var_idx.push_back(current_node_vars)
+            #x_var_names.push_back(current_node_varnames)
+            #x_var_sizes.push_back(current_node_vars_sizes)
             for i in xrange(info[X_DEG]):
                 neighborId = info[X_NEIGHBORS][i]
                 indices = (Z_ZIJIND, Z_UIJIND) if nid < neighborId else\
@@ -692,8 +708,8 @@ class TGraphVX(TUNGraph):
             node_list.append(entry)
         
         #Don't hardcode these values you colossal fool!
-        self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
-        self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
+        #self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
+        #self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         self.ADMM_obj.Solve()
         if UseSlowADMM == True:
             pool = multiprocessing.Pool(num_processors)

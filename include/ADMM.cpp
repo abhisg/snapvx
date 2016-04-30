@@ -40,6 +40,40 @@ void ADMM::LoadEdges(std::vector<LinOp* > &objectives,std::vector<std::vector< L
 	}	
 }
 
+void ADMM::LoadNodeProximal(ProximalOperator prox,std::vector<int>  &x_var_idx,
+				std::vector<std::string> &x_var_names,
+				std::vector<std::vector<int> >  &neighbour_var_idx,
+				std::vector<int>  &sizes,
+				std::vector<std::vector<double> >  &args)
+{
+	//need zij and uij for all neighbours of i
+	node_prox = prox;
+
+	
+	Node *newnode = new Node;
+	newnode->node_objective = NULL;
+	newnode->node_constraints = std::vector<LinOp *>();
+	newnode->neighbour_var_idx = neighbour_var_idx;
+	newnode->x_var_idx = x_var_idx;
+	newnode->args = std::vector<Eigen::MatrixXd>();
+	for ( int j = 0 ; j < x_var_idx.size(); ++j){
+		node_x_vals[x_var_idx[j]] = {Eigen::MatrixXd::Constant(sizes[j],1,0),x_var_names[j],0};
+		size_x += sizes[j];
+		for ( int k = 0 ; k < neighbour_var_idx[j].size(); ++k){
+			edge_u_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes[j],1,0);
+			edge_z_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes[j],1,0);
+			size_z += sizes[j];
+		}
+		Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[j],1);
+		for ( int k = 0 ; k < args[j].size(); ++k ){
+			argmat(k,0) = args[j][k];
+		}
+		newnode->args.push_back(argmat);
+	}
+	node_list.push_back(newnode);
+}
+
+//for bulk loading of nodes
 void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> > &x_var_idx,
 				std::vector<std::vector<std::string> > &x_var_names,
 				std::vector<std::vector<std::vector<int> > > &neighbour_var_idx,
@@ -57,9 +91,9 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		}
 	}
 	//declare the arrays
-	node_x_vals.resize(x_var_size);// = new Node_Var[x_var_size];
-	edge_z_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
-	edge_u_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
+	//node_x_vals.resize(x_var_size);// = new Node_Var[x_var_size];
+	//edge_z_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
+	//edge_u_vals.resize(z_var_size);// = new Eigen::MatrixXd[z_var_size];
 	
 	for ( int i = 0 ; i < x_var_idx.size(); ++i){
 		Node *newnode = new Node;
@@ -91,6 +125,20 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 	znorm =  Eigen::MatrixXd::Constant(z_var_size,1,0);*/
 }
 
+void ADMM::LoadEdgeProximal(ProximalOperator prox,std::vector<std::pair<int,int> > &edge_var_idx,std::vector<std::pair<int,int> > &node_var_idx,int arg=0)
+{
+	//need xi and uij for all zij
+	edge_prox = prox;
+	prox_edge_arg = arg;
+	Edge *newedge = new Edge;
+	newedge->edge_objective = NULL;
+	newedge->edge_constraints = std::vector<LinOp *>();
+	newedge->edge_var_idx = edge_var_idx;
+	newedge->node_var_idx = node_var_idx;
+	edge_list.push_back(newedge);
+}
+
+//for bulk loading of edges
 void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::pair<int,int> > > &edge_var_idx,std::vector<std::vector<std::pair<int,int> > > &node_var_idx,int arg=0)
 {
 	//need xi and uij for all zij
@@ -121,7 +169,7 @@ void ADMM::Solve()
 			#pragma omp parallel for schedule(dynamic, 8)
 		//#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
-			ADMM_x(node_list[i]);
+			ADMM_node(node_list[i]);
 		}
 		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in x = " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<std::endl;
@@ -129,19 +177,10 @@ void ADMM::Solve()
 			#pragma omp parallel for schedule(dynamic, 16)
 		//#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			ADMM_z(edge_list[i]);
-			//ADMM_u(edge_list[i]);
+			ADMM_edge(edge_list[i]);
 		}
 		std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in z and u = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
-		/*//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 2)
-		//#endif
-		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			ADMM_u(edge_list[i]);
-		}
-		std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
-		std::cout << "Time difference in u = " << std::chrono::duration_cast<std::chrono::microseconds>(t4 - t3).count() <<std::endl;*/
 		std::cout << sqrt(primal_res) << " " << e_pri << " " << sqrt(dual_res) << " " << e_dual << "\n";
 		if ( sqrt(primal_res) <= e_pri && sqrt(dual_res) <= e_dual ){
 			break;
@@ -156,7 +195,7 @@ void ADMM::PrintSolution()
 	}
 }
 	
-void ADMM::ADMM_x(Node *node){
+void ADMM::ADMM_node(Node *node){
 	//TODO : change the rho of the objective
 	//TODO : initialise the increment variable,add parameters in the square objective
 	//*node_x_vals[i] = solve(MINIMIZE,node_objectives[i],node_constraints[i],solver_options);
@@ -185,7 +224,7 @@ void ADMM::ADMM_x(Node *node){
 	}
 }
 
-void ADMM::ADMM_z(Edge *edge){
+void ADMM::ADMM_edge(Edge *edge){
 	//TODO : change the rho of the objective
 	if ( edge->edge_objective != NULL ){
 		Solution soln = solve(MINIMIZE,edge->edge_objective,edge->edge_constraints,solver_options);
@@ -230,17 +269,5 @@ void ADMM::ADMM_z(Edge *edge){
 	}
 }
 
-void ADMM::ADMM_u(Edge *edge){
-	for ( int j = 0 ; j < edge->edge_var_idx.size(); ++j ){
-		if ( edge->edge_var_idx[j].first != 0 || edge->edge_var_idx[j].second != 0 ){
-			edge_u_vals[edge->edge_var_idx[j].first] += node_x_vals[edge->node_var_idx[j].first].value - edge_z_vals[edge->edge_var_idx[j].first];
-			edge_u_vals[edge->edge_var_idx[j].second] += node_x_vals[edge->node_var_idx[j].second].value - edge_z_vals[edge->edge_var_idx[j].second];
-			#pragma omp atomic update
-			unorm += edge_u_vals[edge->edge_var_idx[j].first].squaredNorm() + edge_u_vals[edge->edge_var_idx[j].second].squaredNorm();
-		}
-
-	}
-		
-}
 
 	

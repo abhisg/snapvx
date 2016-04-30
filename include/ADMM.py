@@ -196,6 +196,8 @@ class ADMM(_object):
     def LoadEdges(self, *args): return _ADMM.ADMM_LoadEdges(self, *args)
     def LoadNodesProximal(self, *args): return _ADMM.ADMM_LoadNodesProximal(self, *args)
     def LoadEdgesProximal(self, *args): return _ADMM.ADMM_LoadEdgesProximal(self, *args)
+    def LoadNodeProximal(self, *args): return _ADMM.ADMM_LoadNodeProximal(self, *args)
+    def LoadEdgeProximal(self, *args): return _ADMM.ADMM_LoadEdgeProximal(self, *args)
     def Solve(self): return _ADMM.ADMM_Solve(self)
     def PrintSolution(self): return _ADMM.ADMM_PrintSolution(self)
     __swig_destroy__ = _ADMM.delete_ADMM
