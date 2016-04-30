@@ -71,17 +71,17 @@ class ADMM
 		Eigen::MatrixXd xnorm;
 		Eigen::MatrixXd znorm;
 		Eigen::MatrixXd unorm;*/
-		double primal_res;
+		/*double primal_res;
 		double dual_res;
 		double xnorm;
 		double znorm;
-		double unorm;
+		double unorm;*/
 		double size_x;
 		double size_z;
 
 		//solver functions
 		void ADMM_node(Node *);
-		void ADMM_edge(Edge *);
+		void ADMM_edge(Edge *,double&,double&,double&,double&,double&);
 		//void copyLinop(LinOp* const&,LinOp* const&);
 	public:
 		ADMM();

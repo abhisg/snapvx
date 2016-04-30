@@ -157,16 +157,14 @@ void ADMM::LoadEdgesProximal(ProximalOperator prox,std::vector<std::vector<std::
 void ADMM::Solve()
 {
 	for(int iter = 0 ; iter <= 1000; ++iter){
-		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm,znorm)) + 0.0001;
-		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm) + 0.0001;
-		primal_res = 0;
-		dual_res = 0;
-		xnorm = 0;
-		unorm = 0;
-		znorm = 0;
+		double primal_res = 0;
+		double dual_res = 0;
+		double xnorm = 0;
+		double unorm = 0;
+		double znorm = 0;
 		std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 		//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 16)
+			#pragma omp parallel for schedule(dynamic, 32)
 		//#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
 			ADMM_node(node_list[i]);
@@ -174,13 +172,15 @@ void ADMM::Solve()
 		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in x = " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<std::endl;
 		//#if defined(_OPENMP)
-			#pragma omp parallel for schedule(dynamic, 64)
+			#pragma omp parallel for schedule(dynamic, 64) reduction(+:primal_res,dual_res,xnorm,unorm,znorm)
 		//#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			ADMM_edge(edge_list[i]);
+			ADMM_edge(edge_list[i],primal_res,dual_res,xnorm,unorm,znorm);
 		}
 		std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in z and u = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
+		double e_pri = sqrt(size_x) * 0.01 + 0.01 * sqrt(std::max(xnorm,znorm)) + 0.0001;
+		double e_dual = sqrt(size_z) * 0.01 + 0.01 * sqrt(unorm) + 0.0001;
 		std::cout << sqrt(primal_res) << " " << e_pri << " " << sqrt(dual_res) << " " << e_dual << "\n";
 		if ( sqrt(primal_res) <= e_pri && sqrt(dual_res) <= e_dual ){
 			break;
@@ -224,7 +224,7 @@ void ADMM::ADMM_node(Node *node){
 	}
 }
 
-void ADMM::ADMM_edge(Edge *edge){
+void ADMM::ADMM_edge(Edge *edge,double &primal_res,double &dual_res,double &xnorm,double &unorm,double &znorm){
 	//TODO : change the rho of the objective
 	if ( edge->edge_objective != NULL ){
 		Solution soln = solve(MINIMIZE,edge->edge_objective,edge->edge_constraints,solver_options);
@@ -251,7 +251,7 @@ void ADMM::ADMM_edge(Edge *edge){
 							edge_u_vals[edge->edge_var_idx[j].first] += x_i - edge_z_vals[edge->edge_var_idx[j].first];
 							edge_u_vals[edge->edge_var_idx[j].second] += x_j - edge_z_vals[edge->edge_var_idx[j].second];
 							
-							#pragma omp critical
+							//#pragma omp critical
 							{	
 								primal_res += (x_i - z_ij).squaredNorm() + (x_j - z_ji).squaredNorm();
 								dual_res += (edge_z_vals[edge->edge_var_idx[j].first] - z_ij ).squaredNorm()+

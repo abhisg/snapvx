@@ -478,7 +478,7 @@ class TGraphVX(TUNGraph):
     # Implementation of distributed ADMM
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
-    @profile
+    #@profile
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
                     verbose, UseSlowADMM):
         global node_vals, edge_z_vals, edge_u_vals, rho
