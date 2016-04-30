@@ -568,8 +568,8 @@ class TGraphVX(TUNGraph):
         #node_var_idx = PairVector2D()
         #edge_var_idx = PairVector2D()
         for ei in self.Edges():
-            current_node_var_idx = IntVector2D()
-            current_edge_var_idx = IntVector2D()
+            current_node_var_idx = PairVector()
+            current_edge_var_idx = PairVector()
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             info_i = node_info[etup[0]]
             info_j = node_info[etup[1]]
@@ -604,17 +604,17 @@ class TGraphVX(TUNGraph):
             for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
                 for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
                     if (i_varID,j_varID) in edge_proximal_args:
-                        #pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
-                        #             node_vars_map[(j_varID,etup[1])])
-                        pair_node = IntVector(2,0)
-                        pair_node[0],pair_node[1] = node_vars_map[(i_varID,etup[0])],\
-                                                    node_vars_map[(j_varID,etup[1])]
+                        pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
+                                     node_vars_map[(j_varID,etup[1])])
+                        #pair_node = IntVector(2,0)
+                        #pair_node[0],pair_node[1] = node_vars_map[(i_varID,etup[0])],\
+                        #                           node_vars_map[(j_varID,etup[1])]
                         current_node_var_idx.push_back(pair_node)
-                        #pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
-                        #             edge_vars_map[(j_varID,etup[1],etup[0])])
-                        pair_edge = IntVector(2,0)
-                        pair_edge[0],pair_edge[1] = edge_vars_map[(i_varID,etup[0],etup[1])],\
-                                                    edge_vars_map[(j_varID,etup[1],etup[0])]
+                        pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
+                                     edge_vars_map[(j_varID,etup[1],etup[0])])
+                        #pair_edge = IntVector(2,0)
+                        #pair_edge[0],pair_edge[1] = edge_vars_map[(i_varID,etup[0],etup[1])],\
+                        #                            edge_vars_map[(j_varID,etup[1],etup[0])]
                         current_edge_var_idx.push_back(pair_edge)
             #node_var_idx.push_back(current_node_var_idx)
             #edge_var_idx.push_back(current_edge_var_idx)
