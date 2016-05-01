@@ -35,6 +35,7 @@ from scipy.sparse import lil_matrix
 import sys
 import time
 import line_profiler
+import itertools
 import __builtin__
 
 # File format: One edge per line, written as "srcID dstID"
@@ -478,7 +479,7 @@ class TGraphVX(TUNGraph):
     # Implementation of distributed ADMM
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
-    #@profile
+    @profile
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
                     verbose, UseSlowADMM):
         global node_vals, edge_z_vals, edge_u_vals, rho
@@ -492,8 +493,8 @@ class TGraphVX(TUNGraph):
         if verbose:
             print 'Distributed ADMM (%d processors)' % num_processors
 
-        node_objectives = LinOpVector()
-        node_constraints = LinOpVector2D()
+        #node_objectives = LinOpVector()
+        #node_constraints = LinOpVector2D()
         #proximal_args = DataVector()
         # Organize information for each node in helper node_info structure
         node_info = {}
@@ -503,20 +504,21 @@ class TGraphVX(TUNGraph):
         node_vars_map,node_map_offset = {},0
         #node_args = DataVector()
         #all_node_args = DoubleVector3D()
+        start = time.time()
         for ni in self.Nodes():
             nid = ni.GetId()
             deg = ni.GetDeg()
             obj = self.node_objectives[nid]
             variables = self.node_variables[nid]
-            node_args = self.node_proximalArgs[nid]
-            if node_args is None:
-                node_args = [[] for (varID, varName, var, offset) in variables]
+            #node_args = self.node_proximalArgs[nid]
+            #if node_args is None:
+            #    node_args = [[] for (varID, varName, var, offset) in variables]
             sizes = []
             for (varID, varName, var, offset) in variables:
                 node_vars_map[(varID,nid)] = node_map_offset
                 sizes.append(var.size[0])
                 node_map_offset += 1
-            proximal_args = DoubleVector2D()
+            #proximal_args = DoubleVector2D()
             """for j in xrange(__builtin__.len(node_args)):
                 argument = DoubleVector(sizes[j],0)
                 if node_args != []:
@@ -550,6 +552,8 @@ class TGraphVX(TUNGraph):
             node_info[nid] = (nid, obj, variables, con, length, size, deg,\
                                   neighbors)
             length += size
+        delta = time.time() - start
+        print "Node map creation time",delta
         #ADMM_obj.LoadNodes(node_objectives,node_constraints)
         #print "loaded the nodes"
         #node_vals = multiprocessing.Array('d', [0.0] * length)
@@ -563,13 +567,14 @@ class TGraphVX(TUNGraph):
         # values Arrays
         length = 0
         edge_vars_map,edge_map_offset = {},0
-        edge_objectives = LinOpVector()
-        edge_constraints = LinOpVector2D()
+        #edge_objectives = LinOpVector()
+        #edge_constraints = LinOpVector2D()
         #node_var_idx = PairVector2D()
         #edge_var_idx = PairVector2D()
+        start = time.time()
         for ei in self.Edges():
-            current_node_var_idx = PairVector()
-            current_edge_var_idx = PairVector()
+            #current_node_var_idx = PairVector()
+            #current_edge_var_idx = PairVector()
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             info_i = node_info[etup[0]]
             info_j = node_info[etup[1]]
@@ -601,21 +606,32 @@ class TGraphVX(TUNGraph):
                     edge_map_offset += 1
                     #norms += square(norm(var))
             edge_proximal_args = self.edge_proximalArgs[etup]
-            for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
+            varId_i = [varId for (varId,_,_,_) in info_i[X_VARS]]
+            varId_j = [varId for (varId,_,_,_) in info_j[X_VARS]]
+            #print [varID for (varID, varName, var, offset) in itertools.product(info_i[X_VARS],info_j[X_VARS])]
+            current_node_var_idx = PairVector([IntPair(node_vars_map[(elem_i,etup[0])],\
+                                     node_vars_map[(elem_j,etup[1])]) \
+                                    for(elem_i,elem_j) \
+                                    in list(itertools.product(varId_i,varId_j))
+                                    if (elem_i,elem_j) in edge_proximal_args])
+            current_edge_var_idx = PairVector([IntPair(edge_vars_map[(elem_i,etup[0],etup[1])],\
+                                     edge_vars_map[(elem_j,etup[1],etup[0])]) \
+                                    for(elem_i,elem_j) \
+                                    in list(itertools.product(varId_i,varId_j))
+                                    if (elem_i,elem_j) in edge_proximal_args])
+            """for (i_varID, i_varName, i_var, i_offset) in info_i[X_VARS]:
                 for (j_varID, j_varName, j_var, j_offset) in info_j[X_VARS]:
                     if (i_varID,j_varID) in edge_proximal_args:
-                        pair_node = IntPair(node_vars_map[(i_varID,etup[0])],\
-                                     node_vars_map[(j_varID,etup[1])])
+                        pair_node = IntPair(node_vars_map[(i_varID,etup[0])],node_vars_map[(j_varID,etup[1])])
                         #pair_node = IntVector(2,0)
                         #pair_node[0],pair_node[1] = node_vars_map[(i_varID,etup[0])],\
                         #                           node_vars_map[(j_varID,etup[1])]
                         current_node_var_idx.push_back(pair_node)
-                        pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],\
-                                     edge_vars_map[(j_varID,etup[1],etup[0])])
+                        pair_edge = IntPair(edge_vars_map[(i_varID,etup[0],etup[1])],edge_vars_map[(j_varID,etup[1],etup[0])])
                         #pair_edge = IntVector(2,0)
                         #pair_edge[0],pair_edge[1] = edge_vars_map[(i_varID,etup[0],etup[1])],\
                         #                            edge_vars_map[(j_varID,etup[1],etup[0])]
-                        current_edge_var_idx.push_back(pair_edge)
+                        current_edge_var_idx.push_back(pair_edge)"""
             #node_var_idx.push_back(current_node_var_idx)
             #edge_var_idx.push_back(current_edge_var_idx)
             self.ADMM_obj.LoadEdgeProximal(LASSO,current_edge_var_idx,current_node_var_idx,0)
@@ -633,7 +649,8 @@ class TGraphVX(TUNGraph):
             print "Constraint",cons
             #edge_objectives.push_back(obj_canon)
             #edge_constraints.push_back(cons_canon)"""
-            
+        delta = time.time() - start
+        print "Edge load",delta
         #ADMM_obj.LoadEdges(edge_objectives,edge_constraints)
         #print "loaded the edges"
         #edge_z_vals = multiprocessing.Array('d', [0.0] * length)
@@ -665,10 +682,11 @@ class TGraphVX(TUNGraph):
         # Create final node_list structure by adding on information for
         # node neighbors
         node_list = []
-        x_var_idx = IntVector2D()
-        x_var_names = StringVector2D()
-        x_var_sizes = IntVector2D()
-        neighbour_var_idx = IntVector3D();
+        #x_var_idx = IntVector2D()
+        #x_var_names = StringVector2D()
+        #x_var_sizes = IntVector2D()
+        #neighbour_var_idx = IntVector3D();
+        start = time.time()
         for nid, info in node_info.iteritems():
             # Append information about z- and u-value indices for each
             # node neighbor
@@ -682,17 +700,17 @@ class TGraphVX(TUNGraph):
                 current_node_vars.push_back(node_vars_map[(varID,nid)])
                 current_node_varnames.push_back(varName)
                 current_node_vars_sizes.push_back(var.size[0])
-                current_edge_vars = IntVector()
-                for i in xrange(info[X_DEG]):
-                    neighborId = info[X_NEIGHBORS][i]
-                    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
+                current_edge_vars = IntVector([edge_vars_map[(varID,nid,info[X_NEIGHBORS][i])] for i in xrange(info[X_DEG])])
+                #for i in xrange(info[X_DEG]):
+                #    neighborId = info[X_NEIGHBORS][i]
+                #    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
                 current_node_edge_vars.push_back(current_edge_vars)
             proximal_args = DoubleVector2D()
             for j in xrange(__builtin__.len(node_args)):
-                argument = DoubleVector(sizes[j],0)
                 if node_args != []:
-                    for k in xrange(__builtin__.len(node_args[j])):
-                        argument[k] = node_args[j][k]
+                    argument = self.ADMM_obj.numpyToVector(numpy.array(node_args[j],'d'))
+                else:
+                    argument = DoubleVector(sizes[j],0)
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(SQUARE,current_node_vars\
                                            ,current_node_varnames\
@@ -712,11 +730,15 @@ class TGraphVX(TUNGraph):
                     entry.append(einfo[indices[0]])
                     entry.append(einfo[indices[1]])
                 node_list.append(entry)
-        
+        delta = time.time() - start
+        print "Node load",delta
         #Don't hardcode these values you colossal fool!
         #self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
         #self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
+        start = time.time()
         self.ADMM_obj.Solve()
+        delta = time.time() - start
+        print "Solution time",delta
         if UseSlowADMM == True:
             pool = multiprocessing.Pool(num_processors)
             num_iterations = 0

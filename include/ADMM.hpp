@@ -99,6 +99,13 @@ class ADMM
 		/*std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_node_x_vals();
 		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_z_vals();
 		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_u_vals();*/
+
+		//other helper functions
+		std::vector<double> numpyToVector(double *array,int n){
+			std::vector<double> v;
+			v.assign(array,array+n);
+			return v;
+		}
 };
 
 #endif		

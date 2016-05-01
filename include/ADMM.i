@@ -9,6 +9,13 @@
         #include <cstdio>
 %}
 
+%include "CVXcanon/src/python/numpy.i"
+%init %{
+import_array();
+%}
+
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double* array, int n)}
+
 %include "std_vector.i"
 %include "std_map.i"
 %include "std_string.i"
