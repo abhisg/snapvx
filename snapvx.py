@@ -479,7 +479,7 @@ class TGraphVX(TUNGraph):
     # Implementation of distributed ADMM
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
-    @profile
+    #@profile
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
                     verbose, UseSlowADMM):
         global node_vals, edge_z_vals, edge_u_vals, rho
@@ -515,7 +515,8 @@ class TGraphVX(TUNGraph):
             #    node_args = [[] for (varID, varName, var, offset) in variables]
             sizes = []
             for (varID, varName, var, offset) in variables:
-                node_vars_map[(varID,nid)] = node_map_offset
+                #node_vars_map[(varID,nid)] = node_map_offset
+                node_vars_map[varID] = node_map_offset
                 sizes.append(var.size[0])
                 node_map_offset += 1
             #proximal_args = DoubleVector2D()
@@ -598,24 +599,24 @@ class TGraphVX(TUNGraph):
                 edge_info[etup] = tup
             #norms = 0
             for (varID, varName, var, offset) in info_i[X_VARS]:
-                    edge_vars_map[(varID,etup[0],etup[1])] = edge_map_offset
+                    edge_vars_map[varID] = edge_map_offset
                     edge_map_offset += 1
                     #norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
-                    edge_vars_map[(varID,etup[1],etup[0])] = edge_map_offset
+                    edge_vars_map[varID] = edge_map_offset
                     edge_map_offset += 1
                     #norms += square(norm(var))
             edge_proximal_args = self.edge_proximalArgs[etup]
             varId_i = [varId for (varId,_,_,_) in info_i[X_VARS]]
             varId_j = [varId for (varId,_,_,_) in info_j[X_VARS]]
             #print [varID for (varID, varName, var, offset) in itertools.product(info_i[X_VARS],info_j[X_VARS])]
-            current_node_var_idx = PairVector([IntPair(node_vars_map[(elem_i,etup[0])],\
-                                     node_vars_map[(elem_j,etup[1])]) \
+            current_node_var_idx = PairVector([IntPair(node_vars_map[elem_i],\
+                                     node_vars_map[elem_j]) \
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
                                     if (elem_i,elem_j) in edge_proximal_args])
-            current_edge_var_idx = PairVector([IntPair(edge_vars_map[(elem_i,etup[0],etup[1])],\
-                                     edge_vars_map[(elem_j,etup[1],etup[0])]) \
+            current_edge_var_idx = PairVector([IntPair(edge_vars_map[elem_i],\
+                                     edge_vars_map[elem_j]) \
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
                                     if (elem_i,elem_j) in edge_proximal_args])
@@ -697,10 +698,10 @@ class TGraphVX(TUNGraph):
             if node_args is None:
                 node_args = [[] for (varID, varName, var, offset) in variables]
             for (varID, varName, var, offset) in info[X_VARS]:
-                current_node_vars.push_back(node_vars_map[(varID,nid)])
+                current_node_vars.push_back(node_vars_map[varID])
                 current_node_varnames.push_back(varName)
                 current_node_vars_sizes.push_back(var.size[0])
-                current_edge_vars = IntVector([edge_vars_map[(varID,nid,info[X_NEIGHBORS][i])] for i in xrange(info[X_DEG])])
+                current_edge_vars = IntVector([edge_vars_map[varID] for i in xrange(info[X_DEG])])
                 #for i in xrange(info[X_DEG]):
                 #    neighborId = info[X_NEIGHBORS][i]
                 #    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
