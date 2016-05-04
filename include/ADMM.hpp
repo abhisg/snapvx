@@ -27,8 +27,12 @@ typedef struct Edge
 {
 	LinOp* edge_objective;
 	std::vector<LinOp *> edge_constraints;
-	std::vector<std::pair<int,int> > edge_var_idx;
-	std::vector<std::pair<int,int> > node_var_idx;
+	/*std::vector<std::pair<int,int> > edge_var_idx;
+	std::vector<std::pair<int,int> > node_var_idx;*/
+	std::vector<int> edge_var_idx_left;
+	std::vector<int> edge_var_idx_right;
+	std::vector<int> node_var_idx_left;
+	std::vector<int> node_var_idx_right;
 }Edge;
 
 typedef struct Node_Var
@@ -93,7 +97,8 @@ class ADMM
 					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
 		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::vector<double> >  &);
-		void LoadEdgeProximal(ProximalOperator,std::vector<std::pair<int,int> >  &,std::vector<std::pair<int,int> >  &,int);
+		//void LoadEdgeProximal(ProximalOperator,std::vector<std::pair<int,int> >  &,std::vector<std::pair<int,int> >  &,int);
+		void LoadEdgeProximal(ProximalOperator,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
 		void Solve();
 		void PrintSolution();
 		/*std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_node_x_vals();

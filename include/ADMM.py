@@ -143,12 +143,18 @@ class Edge(_object):
     __swig_setmethods__["edge_constraints"] = _ADMM.Edge_edge_constraints_set
     __swig_getmethods__["edge_constraints"] = _ADMM.Edge_edge_constraints_get
     if _newclass:edge_constraints = _swig_property(_ADMM.Edge_edge_constraints_get, _ADMM.Edge_edge_constraints_set)
-    __swig_setmethods__["edge_var_idx"] = _ADMM.Edge_edge_var_idx_set
-    __swig_getmethods__["edge_var_idx"] = _ADMM.Edge_edge_var_idx_get
-    if _newclass:edge_var_idx = _swig_property(_ADMM.Edge_edge_var_idx_get, _ADMM.Edge_edge_var_idx_set)
-    __swig_setmethods__["node_var_idx"] = _ADMM.Edge_node_var_idx_set
-    __swig_getmethods__["node_var_idx"] = _ADMM.Edge_node_var_idx_get
-    if _newclass:node_var_idx = _swig_property(_ADMM.Edge_node_var_idx_get, _ADMM.Edge_node_var_idx_set)
+    __swig_setmethods__["edge_var_idx_left"] = _ADMM.Edge_edge_var_idx_left_set
+    __swig_getmethods__["edge_var_idx_left"] = _ADMM.Edge_edge_var_idx_left_get
+    if _newclass:edge_var_idx_left = _swig_property(_ADMM.Edge_edge_var_idx_left_get, _ADMM.Edge_edge_var_idx_left_set)
+    __swig_setmethods__["edge_var_idx_right"] = _ADMM.Edge_edge_var_idx_right_set
+    __swig_getmethods__["edge_var_idx_right"] = _ADMM.Edge_edge_var_idx_right_get
+    if _newclass:edge_var_idx_right = _swig_property(_ADMM.Edge_edge_var_idx_right_get, _ADMM.Edge_edge_var_idx_right_set)
+    __swig_setmethods__["node_var_idx_left"] = _ADMM.Edge_node_var_idx_left_set
+    __swig_getmethods__["node_var_idx_left"] = _ADMM.Edge_node_var_idx_left_get
+    if _newclass:node_var_idx_left = _swig_property(_ADMM.Edge_node_var_idx_left_get, _ADMM.Edge_node_var_idx_left_set)
+    __swig_setmethods__["node_var_idx_right"] = _ADMM.Edge_node_var_idx_right_set
+    __swig_getmethods__["node_var_idx_right"] = _ADMM.Edge_node_var_idx_right_get
+    if _newclass:node_var_idx_right = _swig_property(_ADMM.Edge_node_var_idx_right_get, _ADMM.Edge_node_var_idx_right_set)
     def __init__(self): 
         this = _ADMM.new_Edge()
         try: self.this.append(this)

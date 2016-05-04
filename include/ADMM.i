@@ -15,6 +15,7 @@ import_array();
 %}
 
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* array, int n)}
+%naturalvar Edge::edge_var_idx_left;
 
 %include "std_vector.i"
 %include "std_map.i"
