@@ -164,7 +164,7 @@ void ADMM::Solve()
 		double znorm = 0;
 		std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 		//#if defined(_OPENMP)
-		//	#pragma omp parallel for schedule(dynamic, 32)
+			#pragma omp parallel for schedule(dynamic, 32)
 		//#endif
 		for ( int i = 0 ; i < node_list.size(); ++i ){
 			ADMM_node(node_list[i]);
@@ -172,7 +172,7 @@ void ADMM::Solve()
 		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 		std::cout << "Time difference in x = " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<std::endl;
 		//#if defined(_OPENMP)
-		//	#pragma omp parallel for schedule(dynamic, 64) reduction(+:primal_res,dual_res,xnorm,unorm,znorm)
+			#pragma omp parallel for schedule(dynamic, 64) reduction(+:primal_res,dual_res,xnorm,unorm,znorm)
 		//#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			ADMM_edge(edge_list[i],primal_res,dual_res,xnorm,unorm,znorm);

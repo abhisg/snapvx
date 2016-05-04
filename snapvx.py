@@ -599,11 +599,11 @@ class TGraphVX(TUNGraph):
                 edge_info[etup] = tup
             #norms = 0
             for (varID, varName, var, offset) in info_i[X_VARS]:
-                    edge_vars_map[varID] = edge_map_offset
+                    edge_vars_map[(varID,etup[1])] = edge_map_offset
                     edge_map_offset += 1
                     #norms += square(norm(var))
             for (varID, varName, var, offset) in info_j[X_VARS]:
-                    edge_vars_map[varID] = edge_map_offset
+                    edge_vars_map[(varID,etup[0])] = edge_map_offset
                     edge_map_offset += 1
                     #norms += square(norm(var))
             edge_proximal_args = self.edge_proximalArgs[etup]
@@ -615,8 +615,8 @@ class TGraphVX(TUNGraph):
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
                                     if (elem_i,elem_j) in edge_proximal_args])
-            current_edge_var_idx = PairVector([IntPair(edge_vars_map[elem_i],\
-                                     edge_vars_map[elem_j]) \
+            current_edge_var_idx = PairVector([IntPair(edge_vars_map[(elem_i,etup[1])],\
+                                     edge_vars_map[(elem_j,etup[0])]) \
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
                                     if (elem_i,elem_j) in edge_proximal_args])
@@ -701,7 +701,7 @@ class TGraphVX(TUNGraph):
                 current_node_vars.push_back(node_vars_map[varID])
                 current_node_varnames.push_back(varName)
                 current_node_vars_sizes.push_back(var.size[0])
-                current_edge_vars = IntVector([edge_vars_map[varID] for i in xrange(info[X_DEG])])
+                current_edge_vars = IntVector([edge_vars_map[(varID,info[X_NEIGHBORS][i])] for i in xrange(info[X_DEG])])
                 #for i in xrange(info[X_DEG]):
                 #    neighborId = info[X_NEIGHBORS][i]
                 #    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
