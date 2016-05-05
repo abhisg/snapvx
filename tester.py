@@ -3,9 +3,9 @@ from snapvx import *
 import numpy as np
 
 np.random.seed(1)
-num_nodes = 250
-num_edges = 2000
-n = 50
+num_nodes = 5
+num_edges = 10
+n = 5
 snapGraph = GenRndGnm(PUNGraph, num_nodes, num_edges)
 gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 
@@ -54,7 +54,7 @@ gvx.AddEdge(2, 3, Objective=square(norm(x2 - x3)), Constraints=[])
 #Solve the problem, and print the solution
 if __name__ == '__main__':
 	start = time.time()
-	gvx.Solve(MaxIters=1)
+	gvx.Solve(Rho=100)
 	print time.time() - start
 	print gvx.PrintSolution()
 

@@ -69,41 +69,28 @@ class ADMM
 
 		std::map<std::string,double > solver_options;
 
-		//for convergence
-		/*Eigen::MatrixXd primal_res;
-		Eigen::MatrixXd dual_res;
-		Eigen::MatrixXd xnorm;
-		Eigen::MatrixXd znorm;
-		Eigen::MatrixXd unorm;*/
-		/*double primal_res;
-		double dual_res;
-		double xnorm;
-		double znorm;
-		double unorm;*/
+		//supplementary variables
 		double size_x;
 		double size_z;
+		double rho;
+		double lambda;
+		double eps_abs;
+		double eps_rel;
 
 		//solver functions
 		void ADMM_node(Node *);
 		void ADMM_edge(Edge *,double&,double&,double&,double&,double&);
-		//void copyLinop(LinOp* const&,LinOp* const&);
 	public:
 		ADMM();
-		/*void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);*/
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> > &,std::vector<std::vector<std::string> > &,
 					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
 		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::vector<double> >  &);
-		//void LoadEdgeProximal(ProximalOperator,std::vector<std::pair<int,int> >  &,std::vector<std::pair<int,int> >  &,int);
 		void LoadEdgeProximal(ProximalOperator,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
-		void Solve();
+		void Solve(double,double,double,double);
 		void PrintSolution();
-		/*std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_node_x_vals();
-		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_z_vals();
-		std::vector<std::unordered_map<int, Eigen::MatrixXd> > get_edge_u_vals();*/
 
 		//other helper functions
 		std::vector<double> numpyToVector(double *array,int n){

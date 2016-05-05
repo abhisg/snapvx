@@ -34,7 +34,7 @@ import scipy
 from scipy.sparse import lil_matrix
 import sys
 import time
-import line_profiler
+#import line_profiler
 import itertools
 import __builtin__
 
@@ -312,7 +312,7 @@ class TGraphVX(TUNGraph):
     # Option to use serial version or distributed ADMM.
     # maxIters optional parameter: Maximum iterations for distributed ADMM.
     def Solve(self, M=Minimize, UseADMM=True, NumProcessors=0, Rho=1.0,
-              MaxIters=250, EpsAbs=0.01, EpsRel=0.01, Verbose=False, 
+              MaxIters=250, EpsAbs=0.01, EpsRel=0.01, Verbose=False, Lambda=1,
               UseClustering = False, ClusterSize = 1000, UseSlowADMM = False):
         global m_func
         m_func = M
@@ -323,11 +323,11 @@ class TGraphVX(TUNGraph):
         if UseClustering and ClusterSize > 0:
             SuperNodes = self.__ClusterGraph(ClusterSize)
             self.__SolveClusterADMM(M,UseADMM,SuperNodes, NumProcessors, Rho, MaxIters,\
-                                     EpsAbs, EpsRel, Verbose )
+                                     EpsAbs, EpsRel, Verbose)
             return
         if UseADMM and self.GetEdges() != 0:
             self.__SolveADMM(NumProcessors, Rho, MaxIters, EpsAbs, EpsRel,
-                             Verbose, UseSlowADMM)
+                             Verbose, UseSlowADMM, Lambda)
             return
         if Verbose:
             print 'Serial ADMM'
@@ -479,9 +479,9 @@ class TGraphVX(TUNGraph):
     # Implementation of distributed ADMM
     # Uses a global value of rho_param for rho
     # Will run for a maximum of maxIters iterations
-    @profile
+    #@profile
     def __SolveADMM(self, numProcessors, rho_param, maxIters, eps_abs, eps_rel,
-                    verbose, UseSlowADMM):
+                    verbose, UseSlowADMM, Lambda):
         global node_vals, edge_z_vals, edge_u_vals, rho
         global getValue, rho_update_func
 
@@ -775,7 +775,8 @@ class TGraphVX(TUNGraph):
         #self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
         #self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         start = time.time()
-        self.ADMM_obj.Solve()
+        print rho_param
+        self.ADMM_obj.Solve(rho_param, eps_abs, eps_rel, Lambda)
         delta = time.time() - start
         print "Solution time",delta
         if UseSlowADMM == True:
