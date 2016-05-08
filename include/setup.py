@@ -14,7 +14,7 @@ ADMM_module = Extension('_ADMM',
 			include_dirs = [cwd+'/CVXCanon/include/Eigen/',cwd+'/ecos/include',cwd+'/ecos/external/SuiteSparse_config'],
 			library_dirs = ['ecos'],
 			libraries = ['ecos'],
-			swig_opts = ['-c++','-I '+cwd+'/ADMM.i'],
+			swig_opts = ['-c++','-I '+cwd+'/ADMM.i -I '+cwd+'/CVXcanon/include/Eigen/src/Core/'],
 			extra_compile_args = ['-Wall','-O2','-pg','-std=c++0x', '-fopenmp', '-ftree-vectorize'],
 			extra_link_args = ['-lrt','-lgomp'] #required for older glibc versions
                            )

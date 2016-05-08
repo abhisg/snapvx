@@ -12,9 +12,11 @@ gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 #For each node, add an objective (using random data)
 for i in range(num_nodes):
 	x = Variable(n,name='x') #Each node has its own variable named 'x'
-  	a = numpy.random.randn(n)
+  	b = np.random.randn(n)
+	mu = np.random.rand()
+	y = np.random.randint(0,2)
   	#gvx.SetNodeObjective(i, square(norm(x-a)))
-	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:a})
+	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'b':b,'mu':mu,'y':y}},proximalOperator=MOD_SQUARE)
 #def netLasso(src, dst, data):
 #	return (norm(src['x'] - dst['x'],2), [])
 #gvx.AddEdgeObjectives(netLasso)
@@ -54,7 +56,7 @@ gvx.AddEdge(2, 3, Objective=square(norm(x2 - x3)), Constraints=[])
 #Solve the problem, and print the solution
 if __name__ == '__main__':
 	start = time.time()
-	gvx.Solve(Rho=100)
+	gvx.Solve(Rho=1)
 	print time.time() - start
 	print gvx.PrintSolution()
 

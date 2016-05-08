@@ -50,18 +50,19 @@ void ADMM::LoadNodeProximal(ProximalOperator prox,std::vector<int>  &x_var_idx,
 				std::vector<std::string> &x_var_names,
 				std::vector<std::vector<int> >  &neighbour_var_idx,
 				std::vector<int>  &sizes,
-				std::vector<std::vector<double> >  &args)
+				//std::vector<std::vector<double> >  &args)
+				std::vector<std::map<std::string,Eigen::MatrixXd > >  &args)
 {
 	//need zij and uij for all neighbours of i
 	node_prox = prox;
-
+	std::cout << "prox " << node_prox << "\n";
 	x_var_size += x_var_idx.size();	
 	Node *newnode = new Node;
 	newnode->node_objective = NULL;
 	newnode->node_constraints = std::vector<LinOp *>();
 	newnode->neighbour_var_idx = neighbour_var_idx;
 	newnode->x_var_idx = x_var_idx;
-	newnode->args = std::vector<Eigen::MatrixXd>();
+	newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();
 	for ( int j = 0 ; j < x_var_idx.size(); ++j){
 		node_x_vals[x_var_idx[j]] = {Eigen::MatrixXd::Constant(sizes[j],1,0),x_var_names[j],0};
 		size_x += sizes[j];
@@ -71,11 +72,12 @@ void ADMM::LoadNodeProximal(ProximalOperator prox,std::vector<int>  &x_var_idx,
 			edge_z_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes[j],1,0);
 			size_z += sizes[j];
 		}
-		Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[j],1);
+		/*Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[j],1);
 		for ( int k = 0 ; k < args[j].size(); ++k ){
 			argmat(k,0) = args[j][k];
-		}
-		newnode->args.push_back(argmat);
+		}*/
+		//Eigen::MatrixXd argmat = args[j];
+		newnode->args.push_back(args[j]);
 	}
 	node_list.push_back(newnode);
 }
@@ -99,7 +101,7 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 		newnode->node_constraints = std::vector<LinOp *>();
 		newnode->neighbour_var_idx = neighbour_var_idx[i];
 		newnode->x_var_idx = x_var_idx[i];
-		newnode->args = std::vector<Eigen::MatrixXd>();
+		newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();
 		for ( int j = 0 ; j < x_var_idx[i].size(); ++j){
 			node_x_vals[x_var_idx[i][j]] = {Eigen::MatrixXd::Constant(sizes[i][j],1,0),x_var_names[i][j],i};
 			size_x += sizes[i][j];
@@ -109,11 +111,11 @@ void ADMM::LoadNodesProximal(ProximalOperator prox,std::vector<std::vector<int> 
 				edge_z_vals[neighbour_var_idx[i][j][k]] = Eigen::MatrixXd::Constant(sizes[i][j],1,0);
 				size_z += sizes[i][j];
 			}
-			Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[i][j],1);
+			/*Eigen::MatrixXd argmat = Eigen::MatrixXd(sizes[i][j],1);
 			for ( int k = 0 ; k < args[i][j].size(); ++k ){
 				argmat(k,0) = args[i][j][k];
 			}
-			newnode->args.push_back(argmat);
+			newnode->args.push_back(argmat);*/
 		}
 		node_list.push_back(newnode);
 	}
@@ -207,16 +209,25 @@ void ADMM::ADMM_node(Node *node){
 		switch(node_prox){
 			case SQUARE: 	
 					for ( int j = 0 ; j < node->x_var_idx.size(); ++j ){
-						Eigen::MatrixXd increment(2*node->args[j]);
+						Eigen::MatrixXd increment(2*node->args[j]["a"]);
 						for ( int k = 0 ; k < node->neighbour_var_idx[j].size(); ++k ){
 							increment += rho*(edge_z_vals[node->neighbour_var_idx[j][k]] - edge_u_vals[node->neighbour_var_idx[j][k]]);
 						}
 						node_x_vals[node->x_var_idx[j]].value = increment/(2+rho*node->neighbour_var_idx[j].size());
-						//std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
-					}
-					
+					}	
 					break;
-			case LASSO:
+			case MOD_SQUARE:
+					for ( int j = 0 ; j < node->x_var_idx.size(); ++j ){
+						Eigen::MatrixXd increment(node->args[j]["rhs"]);
+						for ( int k = 0 ; k < node->neighbour_var_idx[j].size(); ++k ){
+							increment += rho*(edge_z_vals[node->neighbour_var_idx[j][k]] - edge_u_vals[node->neighbour_var_idx[j][k]]);
+						}
+						node_x_vals[node->x_var_idx[j]].value = node->args[j]["lhs"]*increment;
+						std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
+					}	
+					break;
+					
+			case NETLASSO:
 					break;
 			default:std::cout<<"not implemented yet";exit(-1);
 		}
@@ -234,7 +245,7 @@ void ADMM::ADMM_edge(Edge *edge,double &primal_res,double &dual_res,double &xnor
 		switch(edge_prox){
 			case SQUARE: 	std::cout << "yada yada\n";
 					break;
-			case LASSO:	//std::cout << "yada yada z\n";
+			case NETLASSO:	//std::cout << "yada yada z\n";
 					for ( int j = 0 ; j < edge->edge_var_idx_left.size(); ++j ){
 						if ( edge->edge_var_idx_left[j] != 0 || edge->edge_var_idx_right[j] != 0 ){
 							Eigen::MatrixXd z_ij = edge_z_vals[edge->edge_var_idx_left[j]];

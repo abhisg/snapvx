@@ -2,6 +2,8 @@
 #define ADMM_H
 
 #include "CVXcanon/src/CVXcanon.hpp"
+#include "CVXcanon/include/Eigen/Sparse"
+#include "CVXcanon/include/Eigen/Core"
 #include <unordered_map>
 #include <string>
 #include <utility>
@@ -10,7 +12,8 @@
 typedef enum ProximalOperator
 {
 	SQUARE,
-	LASSO,
+	MOD_SQUARE,
+	NETLASSO,
 	NONE
 }ProximalOperator;
 
@@ -20,7 +23,7 @@ typedef struct Node
 	std::vector<LinOp *> node_constraints;
 	std::vector<std::vector<int> > neighbour_var_idx;
 	std::vector<int> x_var_idx;
-	std::vector<Eigen::MatrixXd> args;
+	std::vector<std::map<std::string,Eigen::MatrixXd> > args;
 }Node;
 
 typedef struct Edge
@@ -87,16 +90,26 @@ class ADMM
 		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> > &,std::vector<std::vector<std::string> > &,
 					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
 		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
-		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::vector<double> >  &);
+		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::map<std::string,Eigen::MatrixXd> >  &);
 		void LoadEdgeProximal(ProximalOperator,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
 		void Solve(double,double,double,double);
 		void PrintSolution();
 
 		//other helper functions
-		std::vector<double> numpyToVector(double *array,int n){
+		/*std::vector<double> numpyToVector(double *array,int n){
 			std::vector<double> v;
 			v.assign(array,array+n);
 			return v;
+		}*/
+		
+		Eigen::MatrixXd numpyToVector(double *array,int n){
+			Eigen::Map<Eigen::MatrixXd> v(array,n,1);
+			return v;
+		}
+		
+		Eigen::MatrixXd numpyToMatrix(double *array,int m, int n){
+			Eigen::Map<Eigen::MatrixXd> mat(array,m,n);
+			return mat;
 		}
 };
 

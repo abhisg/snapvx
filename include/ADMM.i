@@ -15,7 +15,7 @@ import_array();
 %}
 
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double* array, int n)}
-%naturalvar Edge::edge_var_idx_left;
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2) {(double* array, int m, int n)}
 
 %include "std_vector.i"
 %include "std_map.i"
@@ -37,8 +37,11 @@ namespace std {
    %template(LinOpVector2D) vector<vector< LinOp * > >;
    %template(Solution) map<int,Eigen::MatrixXd>;
    %template(SolutionVector) vector<map<int,Eigen::MatrixXd> >;
+   %template(ArgMap) map<string,Eigen::MatrixXd>;
+   %template(ArgdMapVector) vector<map<string,Eigen::MatrixXd> >;
    %template(IntPair) std::pair<int,int>;
    %template(PairVector) std::vector<std::pair<int,int> >;
    %template(PairVector2D) std::vector<std::vector<std::pair<int,int> > >;
 }
 
+//%include "CVXcanon/include/Eigen/src/Core/Matrix.h"

@@ -99,7 +99,8 @@ SwigPyIterator_swigregister = _ADMM.SwigPyIterator_swigregister
 SwigPyIterator_swigregister(SwigPyIterator)
 
 SQUARE = _ADMM.SQUARE
-LASSO = _ADMM.LASSO
+MOD_SQUARE = _ADMM.MOD_SQUARE
+NETLASSO = _ADMM.NETLASSO
 NONE = _ADMM.NONE
 class Node(_object):
     __swig_setmethods__ = {}
@@ -207,6 +208,7 @@ class ADMM(_object):
     def Solve(self, *args): return _ADMM.ADMM_Solve(self, *args)
     def PrintSolution(self): return _ADMM.ADMM_PrintSolution(self)
     def numpyToVector(self, *args): return _ADMM.ADMM_numpyToVector(self, *args)
+    def numpyToMatrix(self, *args): return _ADMM.ADMM_numpyToMatrix(self, *args)
     __swig_destroy__ = _ADMM.delete_ADMM
     __del__ = lambda self : None;
 ADMM_swigregister = _ADMM.ADMM_swigregister
@@ -777,6 +779,102 @@ class SolutionVector(_object):
     __del__ = lambda self : None;
 SolutionVector_swigregister = _ADMM.SolutionVector_swigregister
 SolutionVector_swigregister(SolutionVector)
+
+class ArgMap(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ArgMap, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ArgMap, name)
+    __repr__ = _swig_repr
+    def iterator(self): return _ADMM.ArgMap_iterator(self)
+    def __iter__(self): return self.iterator()
+    def __nonzero__(self): return _ADMM.ArgMap___nonzero__(self)
+    def __bool__(self): return _ADMM.ArgMap___bool__(self)
+    def __len__(self): return _ADMM.ArgMap___len__(self)
+    def __iter__(self): return self.key_iterator()
+    def iterkeys(self): return self.key_iterator()
+    def itervalues(self): return self.value_iterator()
+    def iteritems(self): return self.iterator()
+    def __getitem__(self, *args): return _ADMM.ArgMap___getitem__(self, *args)
+    def __delitem__(self, *args): return _ADMM.ArgMap___delitem__(self, *args)
+    def has_key(self, *args): return _ADMM.ArgMap_has_key(self, *args)
+    def keys(self): return _ADMM.ArgMap_keys(self)
+    def values(self): return _ADMM.ArgMap_values(self)
+    def items(self): return _ADMM.ArgMap_items(self)
+    def __contains__(self, *args): return _ADMM.ArgMap___contains__(self, *args)
+    def key_iterator(self): return _ADMM.ArgMap_key_iterator(self)
+    def value_iterator(self): return _ADMM.ArgMap_value_iterator(self)
+    def __setitem__(self, *args): return _ADMM.ArgMap___setitem__(self, *args)
+    def asdict(self): return _ADMM.ArgMap_asdict(self)
+    def __init__(self, *args): 
+        this = _ADMM.new_ArgMap(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def empty(self): return _ADMM.ArgMap_empty(self)
+    def size(self): return _ADMM.ArgMap_size(self)
+    def clear(self): return _ADMM.ArgMap_clear(self)
+    def swap(self, *args): return _ADMM.ArgMap_swap(self, *args)
+    def get_allocator(self): return _ADMM.ArgMap_get_allocator(self)
+    def begin(self): return _ADMM.ArgMap_begin(self)
+    def end(self): return _ADMM.ArgMap_end(self)
+    def rbegin(self): return _ADMM.ArgMap_rbegin(self)
+    def rend(self): return _ADMM.ArgMap_rend(self)
+    def count(self, *args): return _ADMM.ArgMap_count(self, *args)
+    def erase(self, *args): return _ADMM.ArgMap_erase(self, *args)
+    def find(self, *args): return _ADMM.ArgMap_find(self, *args)
+    def lower_bound(self, *args): return _ADMM.ArgMap_lower_bound(self, *args)
+    def upper_bound(self, *args): return _ADMM.ArgMap_upper_bound(self, *args)
+    __swig_destroy__ = _ADMM.delete_ArgMap
+    __del__ = lambda self : None;
+ArgMap_swigregister = _ADMM.ArgMap_swigregister
+ArgMap_swigregister(ArgMap)
+
+class ArgdMapVector(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, ArgdMapVector, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, ArgdMapVector, name)
+    __repr__ = _swig_repr
+    def iterator(self): return _ADMM.ArgdMapVector_iterator(self)
+    def __iter__(self): return self.iterator()
+    def __nonzero__(self): return _ADMM.ArgdMapVector___nonzero__(self)
+    def __bool__(self): return _ADMM.ArgdMapVector___bool__(self)
+    def __len__(self): return _ADMM.ArgdMapVector___len__(self)
+    def pop(self): return _ADMM.ArgdMapVector_pop(self)
+    def __getslice__(self, *args): return _ADMM.ArgdMapVector___getslice__(self, *args)
+    def __setslice__(self, *args): return _ADMM.ArgdMapVector___setslice__(self, *args)
+    def __delslice__(self, *args): return _ADMM.ArgdMapVector___delslice__(self, *args)
+    def __delitem__(self, *args): return _ADMM.ArgdMapVector___delitem__(self, *args)
+    def __getitem__(self, *args): return _ADMM.ArgdMapVector___getitem__(self, *args)
+    def __setitem__(self, *args): return _ADMM.ArgdMapVector___setitem__(self, *args)
+    def append(self, *args): return _ADMM.ArgdMapVector_append(self, *args)
+    def empty(self): return _ADMM.ArgdMapVector_empty(self)
+    def size(self): return _ADMM.ArgdMapVector_size(self)
+    def clear(self): return _ADMM.ArgdMapVector_clear(self)
+    def swap(self, *args): return _ADMM.ArgdMapVector_swap(self, *args)
+    def get_allocator(self): return _ADMM.ArgdMapVector_get_allocator(self)
+    def begin(self): return _ADMM.ArgdMapVector_begin(self)
+    def end(self): return _ADMM.ArgdMapVector_end(self)
+    def rbegin(self): return _ADMM.ArgdMapVector_rbegin(self)
+    def rend(self): return _ADMM.ArgdMapVector_rend(self)
+    def pop_back(self): return _ADMM.ArgdMapVector_pop_back(self)
+    def erase(self, *args): return _ADMM.ArgdMapVector_erase(self, *args)
+    def __init__(self, *args): 
+        this = _ADMM.new_ArgdMapVector(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def push_back(self, *args): return _ADMM.ArgdMapVector_push_back(self, *args)
+    def front(self): return _ADMM.ArgdMapVector_front(self)
+    def back(self): return _ADMM.ArgdMapVector_back(self)
+    def assign(self, *args): return _ADMM.ArgdMapVector_assign(self, *args)
+    def resize(self, *args): return _ADMM.ArgdMapVector_resize(self, *args)
+    def insert(self, *args): return _ADMM.ArgdMapVector_insert(self, *args)
+    def reserve(self, *args): return _ADMM.ArgdMapVector_reserve(self, *args)
+    def capacity(self): return _ADMM.ArgdMapVector_capacity(self)
+    __swig_destroy__ = _ADMM.delete_ArgdMapVector
+    __del__ = lambda self : None;
+ArgdMapVector_swigregister = _ADMM.ArgdMapVector_swigregister
+ArgdMapVector_swigregister(ArgdMapVector)
 
 class IntPair(_object):
     __swig_setmethods__ = {}
