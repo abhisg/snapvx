@@ -220,7 +220,7 @@ void ADMM::ADMM_node(Node *node){
 					for ( int j = 0 ; j < node->x_var_idx.size(); ++j ){
 						Eigen::MatrixXd increment(node->args[j]["rhs"]);
 						for ( int k = 0 ; k < node->neighbour_var_idx[j].size(); ++k ){
-							increment += rho*(edge_z_vals[node->neighbour_var_idx[j][k]] - edge_u_vals[node->neighbour_var_idx[j][k]]);
+							increment += rho/2*(edge_z_vals[node->neighbour_var_idx[j][k]] - edge_u_vals[node->neighbour_var_idx[j][k]]);
 						}
 						node_x_vals[node->x_var_idx[j]].value = node->args[j]["lhs"]*increment;
 						//std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
