@@ -12,8 +12,8 @@ gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 #For each node, add an objective (using random data)
 for i in range(num_nodes):
 	x = Variable(n,name='x') #Each node has its own variable named 'x'
-  	b = 1000*np.random.randn(n)
-	mu = np.random.rand()*100
+  	b = 10*np.random.randn(n)
+	mu = np.random.rand()*0.01
 	y = np.random.randint(0,2)
   	#gvx.SetNodeObjective(i, square(norm(x-a)))
 	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'b':b,'mu':mu,'y':y}},proximalOperator=MOD_SQUARE)

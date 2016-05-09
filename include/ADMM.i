@@ -4,10 +4,9 @@
         #define SWIG_FILE_WITH_INIT
         #include "ADMM.hpp"
         #include "CVXcanon/src/Solution.hpp"
-        #include <cstdio>
 %}
 
-%include "CVXcanon/src/python/numpy.i"
+%include "numpy.i"
 %init %{
 import_array();
 %}
@@ -35,13 +34,8 @@ namespace std {
    %template(DoubleVector3D) vector<vector<vector< double > > >;
    %template(LinOpVector) vector< LinOp * >;
    %template(LinOpVector2D) vector<vector< LinOp * > >;
-   %template(Solution) map<int,Eigen::MatrixXd>;
-   %template(SolutionVector) vector<map<int,Eigen::MatrixXd> >;
    %template(ArgMap) map<string,Eigen::MatrixXd>;
    %template(ArgdMapVector) vector<map<string,Eigen::MatrixXd> >;
-   %template(IntPair) std::pair<int,int>;
-   %template(PairVector) std::vector<std::pair<int,int> >;
-   %template(PairVector2D) std::vector<std::vector<std::pair<int,int> > >;
 }
 %inline%{
         
@@ -56,5 +50,3 @@ Eigen::MatrixXd numpyToMatrix(double *array,int m, int n){
 	return mat;
 }
 %}
-//Eigen::MatrixXd numpyToVector(double *array,int n);
-//Eigen::MatrixXd numpyToMatrix(double *array,double m,double n);
