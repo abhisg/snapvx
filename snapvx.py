@@ -745,15 +745,18 @@ class TGraphVX(TUNGraph):
             for j in xrange(__builtin__.len(node_args)):
                 #print operator
                 if operator == SQUARE:
-                    argument["a"] = numpyToVector(numpy.array(node_args[j]['a']))
+                    #argument["a"] = numpyToVector(numpy.array(node_args[j]['a']))
+                    argument["a"] = numpy.array(node_args[j]['a'])
                 elif operator == MOD_SQUARE:
                     b = numpy.array(node_args[j]['b'],'d')
                     mat = numpy.identity(b.shape[0]) * (node_args[j]['mu']+rho*info[X_DEG]/2.)
                     mat[-1,-1] -= node_args[j]['mu']
                     #print mat
                     mat += numpy.outer(b,b)
-                    argument["lhs"] = numpyToMatrix(numpy.linalg.inv(mat).astype('d'))
-                    argument["rhs"] = numpyToVector(b*node_args[j]['y'])
+                    #argument["lhs"] = numpyToMatrix(numpy.linalg.inv(mat).astype('d'))
+                    #argument["rhs"] = numpyToVector(b*node_args[j]['y'])
+                    argument["lhs"] = numpy.linalg.inv(mat).astype('d')
+                    argument["rhs"] = b*node_args[j]['y']
                     #print numpy.linalg.inv(mat).astype('d'),b*node_args[j]['y'],node_args[j]['mu']
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(operator,current_node_vars\
