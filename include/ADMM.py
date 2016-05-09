@@ -207,8 +207,6 @@ class ADMM(_object):
     def LoadEdgeProximal(self, *args): return _ADMM.ADMM_LoadEdgeProximal(self, *args)
     def Solve(self, *args): return _ADMM.ADMM_Solve(self, *args)
     def PrintSolution(self): return _ADMM.ADMM_PrintSolution(self)
-    def numpyToVector(self, *args): return _ADMM.ADMM_numpyToVector(self, *args)
-    def numpyToMatrix(self, *args): return _ADMM.ADMM_numpyToMatrix(self, *args)
     __swig_destroy__ = _ADMM.delete_ADMM
     __del__ = lambda self : None;
 ADMM_swigregister = _ADMM.ADMM_swigregister
@@ -1003,6 +1001,14 @@ class PairVector2D(_object):
 PairVector2D_swigregister = _ADMM.PairVector2D_swigregister
 PairVector2D_swigregister(PairVector2D)
 
+
+def numpyToVector(*args):
+  return _ADMM.numpyToVector(*args)
+numpyToVector = _ADMM.numpyToVector
+
+def numpyToMatrix(*args):
+  return _ADMM.numpyToMatrix(*args)
+numpyToMatrix = _ADMM.numpyToMatrix
 # This file is compatible with both classic and new-style classes.
 
 

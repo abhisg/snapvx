@@ -3,8 +3,8 @@ from snapvx import *
 import numpy as np
 
 np.random.seed(1)
-num_nodes = 5
-num_edges = 10
+num_nodes = 50
+num_edges = 100
 n = 5
 snapGraph = GenRndGnm(PUNGraph, num_nodes, num_edges)
 gvx = TGraphVX(snapGraph,use_proximal_updates=True)
@@ -12,8 +12,8 @@ gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 #For each node, add an objective (using random data)
 for i in range(num_nodes):
 	x = Variable(n,name='x') #Each node has its own variable named 'x'
-  	b = np.random.randn(n)
-	mu = np.random.rand()
+  	b = 1000*np.random.randn(n)
+	mu = np.random.rand()*100
 	y = np.random.randint(0,2)
   	#gvx.SetNodeObjective(i, square(norm(x-a)))
 	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'b':b,'mu':mu,'y':y}},proximalOperator=MOD_SQUARE)

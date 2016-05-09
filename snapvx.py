@@ -743,18 +743,18 @@ class TGraphVX(TUNGraph):
                 #    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
                 current_node_edge_vars.push_back(current_edge_vars)
             for j in xrange(__builtin__.len(node_args)):
-                print operator
+                #print operator
                 if operator == SQUARE:
-                    argument["a"] = self.ADMM_obj.numpyToVector(numpy.array(node_args[j]['a']))
+                    argument["a"] = numpyToVector(numpy.array(node_args[j]['a']))
                 elif operator == MOD_SQUARE:
                     b = numpy.array(node_args[j]['b'],'d')
                     mat = numpy.identity(b.shape[0]) * (node_args[j]['mu']+rho*info[X_DEG]/2.)
                     mat[-1,-1] -= node_args[j]['mu']
-                    print mat
+                    #print mat
                     mat += numpy.outer(b,b)
-                    argument["lhs"] = self.ADMM_obj.numpyToMatrix(numpy.linalg.inv(mat).astype('d'))
-                    argument["rhs"] = self.ADMM_obj.numpyToVector(b*node_args[j]['y'])
-                    print numpy.linalg.inv(mat).astype('d'),b*node_args[j]['y'],node_args[j]['mu']
+                    argument["lhs"] = numpyToMatrix(numpy.linalg.inv(mat).astype('d'))
+                    argument["rhs"] = numpyToVector(b*node_args[j]['y'])
+                    #print numpy.linalg.inv(mat).astype('d'),b*node_args[j]['y'],node_args[j]['mu']
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(operator,current_node_vars\
                                            ,current_node_varnames\

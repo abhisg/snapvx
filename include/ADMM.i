@@ -4,8 +4,6 @@
         #define SWIG_FILE_WITH_INIT
         #include "ADMM.hpp"
         #include "CVXcanon/src/Solution.hpp"
-        #include "CVXcanon/include/Eigen/Sparse"
-        #include "CVXcanon/include/Eigen/Core"
         #include <cstdio>
 %}
 
@@ -22,7 +20,9 @@ import_array();
 %include "std_string.i"
 %include "std_pair.i"
 %include "ADMM.hpp"
-
+%include "typemaps.i"
+%include "eigen.i"
+%eigen_typemaps(Eigen::MatrixXd)
 
 namespace std {
    %template(StringVector) vector< string >;
@@ -43,5 +43,18 @@ namespace std {
    %template(PairVector) std::vector<std::pair<int,int> >;
    %template(PairVector2D) std::vector<std::vector<std::pair<int,int> > >;
 }
+%inline%{
+        
+//helper functions
+Eigen::MatrixXd numpyToVector(double *array,int n){
+	Eigen::Map<Eigen::MatrixXd> v(array,n,1);
+	return v;
+}
 
-//%include "CVXcanon/include/Eigen/src/Core/Matrix.h"
+Eigen::MatrixXd numpyToMatrix(double *array,int m, int n){
+	Eigen::Map<Eigen::MatrixXd> mat(array,m,n);
+	return mat;
+}
+%}
+//Eigen::MatrixXd numpyToVector(double *array,int n);
+//Eigen::MatrixXd numpyToMatrix(double *array,double m,double n);

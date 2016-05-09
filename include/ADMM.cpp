@@ -55,7 +55,7 @@ void ADMM::LoadNodeProximal(ProximalOperator prox,std::vector<int>  &x_var_idx,
 {
 	//need zij and uij for all neighbours of i
 	node_prox = prox;
-	std::cout << "prox " << node_prox << "\n";
+	//std::cout << "prox " << node_prox << "\n";
 	x_var_size += x_var_idx.size();	
 	Node *newnode = new Node;
 	newnode->node_objective = NULL;
@@ -183,7 +183,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 		//std::cout << "Time difference in z and u = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
 		double e_pri = sqrt(size_x) * eps_abs + eps_rel * sqrt(std::max(xnorm,znorm)) + 0.0001;
 		double e_dual = sqrt(size_z) * eps_abs + eps_rel * sqrt(unorm) * rho + 0.0001;
-		std::cout << "r: " << sqrt(primal_res) << "\ne_pri: " << e_pri << "\ns: " << rho * sqrt(dual_res) << "\ne_dual: " << e_dual << "\n";
+		std::cout << "r: " << sqrt(primal_res) << " e_pri: " << e_pri << " s: " << rho * sqrt(dual_res) << " e_dual: " << e_dual << "\n";
 		if ( sqrt(primal_res) <= e_pri && rho * sqrt(dual_res) <= e_dual ){
 			break;
 		}
@@ -223,7 +223,7 @@ void ADMM::ADMM_node(Node *node){
 							increment += rho*(edge_z_vals[node->neighbour_var_idx[j][k]] - edge_u_vals[node->neighbour_var_idx[j][k]]);
 						}
 						node_x_vals[node->x_var_idx[j]].value = node->args[j]["lhs"]*increment;
-						std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
+						//std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
 					}	
 					break;
 					

@@ -102,15 +102,6 @@ class ADMM
 			return v;
 		}*/
 		
-		Eigen::MatrixXd numpyToVector(double *array,int n){
-			Eigen::Map<Eigen::MatrixXd> v(array,n,1);
-			return v;
-		}
-		
-		Eigen::MatrixXd numpyToMatrix(double *array,int m, int n){
-			Eigen::Map<Eigen::MatrixXd> mat(array,m,n);
-			return mat;
-		}
 };
 
 #endif		
