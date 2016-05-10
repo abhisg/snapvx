@@ -11,7 +11,11 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 ADMM_module = Extension('_ADMM',
 			sources = [cwd+'/ADMM.i', cwd+'/ADMM.cpp',cwd+'/CVXcanon/src/CVXcanon.cpp',cwd+'/CVXcanon/src/BuildMatrix.cpp'
 				,cwd+'/CVXcanon/src/EcosProblem.cpp',cwd+'/CVXcanon/src/LinOpOperations.cpp'],
-			include_dirs = [cwd+'/CVXCanon/include/Eigen/',cwd+'/ecos/include',cwd+'/ecos/external/SuiteSparse_config'],
+				#,cwd+'/Solver/NetLasso.hpp',cwd+'/Solver/ModSquare.hpp'
+				#,cwd+'/Solver/Square.hpp',cwd+'/Solver/ProximalMap.hpp'
+				#,cwd+'/Solver/Edge.hpp',cwd+'/Solver/Node.hpp'
+				#,cwd+'Solver/NodeVar.hpp'],
+			include_dirs = [cwd+'/CVXCanon/include/Eigen/',cwd+'/ecos/include',cwd+'/ecos/external/SuiteSparse_config',cwd+'/Solver/'],
 			library_dirs = ['ecos'],
 			libraries = ['ecos'],
 			swig_opts = ['-c++','-I '+cwd+'/ADMM.i -I '+cwd+'/CVXcanon/include/Eigen/src/Core/'],

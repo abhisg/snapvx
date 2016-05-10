@@ -98,97 +98,6 @@ class SwigPyIterator(_object):
 SwigPyIterator_swigregister = _ADMM.SwigPyIterator_swigregister
 SwigPyIterator_swigregister(SwigPyIterator)
 
-SQUARE = _ADMM.SQUARE
-MOD_SQUARE = _ADMM.MOD_SQUARE
-NETLASSO = _ADMM.NETLASSO
-NONE = _ADMM.NONE
-class Node(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Node, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, Node, name)
-    __repr__ = _swig_repr
-    __swig_setmethods__["node_objective"] = _ADMM.Node_node_objective_set
-    __swig_getmethods__["node_objective"] = _ADMM.Node_node_objective_get
-    if _newclass:node_objective = _swig_property(_ADMM.Node_node_objective_get, _ADMM.Node_node_objective_set)
-    __swig_setmethods__["node_constraints"] = _ADMM.Node_node_constraints_set
-    __swig_getmethods__["node_constraints"] = _ADMM.Node_node_constraints_get
-    if _newclass:node_constraints = _swig_property(_ADMM.Node_node_constraints_get, _ADMM.Node_node_constraints_set)
-    __swig_setmethods__["neighbour_var_idx"] = _ADMM.Node_neighbour_var_idx_set
-    __swig_getmethods__["neighbour_var_idx"] = _ADMM.Node_neighbour_var_idx_get
-    if _newclass:neighbour_var_idx = _swig_property(_ADMM.Node_neighbour_var_idx_get, _ADMM.Node_neighbour_var_idx_set)
-    __swig_setmethods__["x_var_idx"] = _ADMM.Node_x_var_idx_set
-    __swig_getmethods__["x_var_idx"] = _ADMM.Node_x_var_idx_get
-    if _newclass:x_var_idx = _swig_property(_ADMM.Node_x_var_idx_get, _ADMM.Node_x_var_idx_set)
-    __swig_setmethods__["args"] = _ADMM.Node_args_set
-    __swig_getmethods__["args"] = _ADMM.Node_args_get
-    if _newclass:args = _swig_property(_ADMM.Node_args_get, _ADMM.Node_args_set)
-    def __init__(self): 
-        this = _ADMM.new_Node()
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _ADMM.delete_Node
-    __del__ = lambda self : None;
-Node_swigregister = _ADMM.Node_swigregister
-Node_swigregister(Node)
-
-class Edge(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Edge, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, Edge, name)
-    __repr__ = _swig_repr
-    __swig_setmethods__["edge_objective"] = _ADMM.Edge_edge_objective_set
-    __swig_getmethods__["edge_objective"] = _ADMM.Edge_edge_objective_get
-    if _newclass:edge_objective = _swig_property(_ADMM.Edge_edge_objective_get, _ADMM.Edge_edge_objective_set)
-    __swig_setmethods__["edge_constraints"] = _ADMM.Edge_edge_constraints_set
-    __swig_getmethods__["edge_constraints"] = _ADMM.Edge_edge_constraints_get
-    if _newclass:edge_constraints = _swig_property(_ADMM.Edge_edge_constraints_get, _ADMM.Edge_edge_constraints_set)
-    __swig_setmethods__["edge_var_idx_left"] = _ADMM.Edge_edge_var_idx_left_set
-    __swig_getmethods__["edge_var_idx_left"] = _ADMM.Edge_edge_var_idx_left_get
-    if _newclass:edge_var_idx_left = _swig_property(_ADMM.Edge_edge_var_idx_left_get, _ADMM.Edge_edge_var_idx_left_set)
-    __swig_setmethods__["edge_var_idx_right"] = _ADMM.Edge_edge_var_idx_right_set
-    __swig_getmethods__["edge_var_idx_right"] = _ADMM.Edge_edge_var_idx_right_get
-    if _newclass:edge_var_idx_right = _swig_property(_ADMM.Edge_edge_var_idx_right_get, _ADMM.Edge_edge_var_idx_right_set)
-    __swig_setmethods__["node_var_idx_left"] = _ADMM.Edge_node_var_idx_left_set
-    __swig_getmethods__["node_var_idx_left"] = _ADMM.Edge_node_var_idx_left_get
-    if _newclass:node_var_idx_left = _swig_property(_ADMM.Edge_node_var_idx_left_get, _ADMM.Edge_node_var_idx_left_set)
-    __swig_setmethods__["node_var_idx_right"] = _ADMM.Edge_node_var_idx_right_set
-    __swig_getmethods__["node_var_idx_right"] = _ADMM.Edge_node_var_idx_right_get
-    if _newclass:node_var_idx_right = _swig_property(_ADMM.Edge_node_var_idx_right_get, _ADMM.Edge_node_var_idx_right_set)
-    def __init__(self): 
-        this = _ADMM.new_Edge()
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _ADMM.delete_Edge
-    __del__ = lambda self : None;
-Edge_swigregister = _ADMM.Edge_swigregister
-Edge_swigregister(Edge)
-
-class Node_Var(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Node_Var, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, Node_Var, name)
-    __repr__ = _swig_repr
-    __swig_setmethods__["value"] = _ADMM.Node_Var_value_set
-    __swig_getmethods__["value"] = _ADMM.Node_Var_value_get
-    if _newclass:value = _swig_property(_ADMM.Node_Var_value_get, _ADMM.Node_Var_value_set)
-    __swig_setmethods__["name"] = _ADMM.Node_Var_name_set
-    __swig_getmethods__["name"] = _ADMM.Node_Var_name_get
-    if _newclass:name = _swig_property(_ADMM.Node_Var_name_get, _ADMM.Node_Var_name_set)
-    __swig_setmethods__["nodeId"] = _ADMM.Node_Var_nodeId_set
-    __swig_getmethods__["nodeId"] = _ADMM.Node_Var_nodeId_get
-    if _newclass:nodeId = _swig_property(_ADMM.Node_Var_nodeId_get, _ADMM.Node_Var_nodeId_set)
-    def __init__(self): 
-        this = _ADMM.new_Node_Var()
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _ADMM.delete_Node_Var
-    __del__ = lambda self : None;
-Node_Var_swigregister = _ADMM.Node_Var_swigregister
-Node_Var_swigregister(Node_Var)
-
 class ADMM(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, ADMM, name, value)
@@ -199,10 +108,6 @@ class ADMM(_object):
         this = _ADMM.new_ADMM()
         try: self.this.append(this)
         except: self.this = this
-    def LoadNodes(self, *args): return _ADMM.ADMM_LoadNodes(self, *args)
-    def LoadEdges(self, *args): return _ADMM.ADMM_LoadEdges(self, *args)
-    def LoadNodesProximal(self, *args): return _ADMM.ADMM_LoadNodesProximal(self, *args)
-    def LoadEdgesProximal(self, *args): return _ADMM.ADMM_LoadEdgesProximal(self, *args)
     def LoadNodeProximal(self, *args): return _ADMM.ADMM_LoadNodeProximal(self, *args)
     def LoadEdgeProximal(self, *args): return _ADMM.ADMM_LoadEdgeProximal(self, *args)
     def Solve(self, *args): return _ADMM.ADMM_Solve(self, *args)

@@ -1,3 +1,5 @@
+#ifndef NODE_H_
+#define NODE_H_
 #include "CVXcanon/src/CVXcanon.hpp"
 #include "NodeVar.h"
 #include <unordered_map>
@@ -13,8 +15,9 @@ class Node
 		std::vector<int> x_var_idx;
 		std::vector<std::map<std::string,Eigen::MatrixXd> > args;
 
-		virtual void ADMM_node(Node *,
-						std::unordered_map<int,Node_Var> &,
+		virtual void ADMM_node(std::unordered_map<int,Node_Var> &,
 						std::unordered_map<int,Eigen::MatrixXd> &,
-						std::unordered_map<int,Eigen::MatrixXd>	&) = 0;
+						std::unordered_map<int,Eigen::MatrixXd>	&,
+						double) = 0;
 };
+#endif

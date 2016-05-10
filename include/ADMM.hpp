@@ -4,6 +4,7 @@
 #include "Solver/Node.hpp"
 #include "Solver/Edge.hpp"
 #include "Solver/NodeVar.hpp"
+#include "Solver/ProximalMap.hpp"
 #include "CVXcanon/include/Eigen/Sparse"
 #include "CVXcanon/include/Eigen/Core"
 #include <unordered_map>
@@ -27,9 +28,6 @@ class ADMM
 		std::unordered_map<int,Node_Var> node_x_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;
-		ProximalOperator edge_prox;
-		ProximalOperator node_prox;
-		int prox_edge_arg;
 		int x_var_size;
 		int z_var_size;
 
@@ -48,25 +46,14 @@ class ADMM
 		//void ADMM_edge(Edge *,double&,double&,double&,double&,double&);
 	public:
 		ADMM();
-		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadNodesProximal(ProximalOperator,std::vector<std::vector<int> > &,std::vector<std::vector<std::string> > &,
-					std::vector<std::vector<std::vector<int> > > &,std::vector<std::vector<int> > &,std::vector<std::vector<std::vector<double> > > &);
-		void LoadEdgesProximal(ProximalOperator,std::vector<std::vector<std::pair<int,int> > > &,std::vector<std::vector<std::pair<int,int> > > &,int);
+		//void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
+		//void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::map<std::string,Eigen::MatrixXd> >  &);
 		void LoadEdgeProximal(ProximalOperator,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
 		void Solve(double,double,double,double);
 		void PrintSolution();
-
-		//other helper functions
-		/*std::vector<double> numpyToVector(double *array,int n){
-			std::vector<double> v;
-			v.assign(array,array+n);
-			return v;
-		}*/
 		
 };
 
 #endif		
-//std::unordered_map<int,Solution> Solve(Sense sense, std::unordered_map<int,LinOp* objective> >,std::unordered_map<int,std::vector< LinOp* > constraints >);
 

@@ -1,3 +1,5 @@
+#ifndef EDGE_H_
+#define EDGE_H_
 #include "CVXcanon/src/CVXcanon.hpp"
 #include "NodeVar.hpp"
 #include <vector>
@@ -12,8 +14,9 @@ class Edge
 		std::vector<int> node_var_idx_left;
 		std::vector<int> node_var_idx_right;
 
-		virtual void ADMM_edge(Edge *,double&,double&,double&,double&,double&,
-							std::unordered_map<int,Node_Var> &,
+		virtual void ADMM_edge(std::unordered_map<int,Node_Var> &,
 							std::unordered_map<int,Eigen::MatrixXd> &,
-							std::unordered_map<int,Eigen::MatrixXd>	&) = 0;
+							std::unordered_map<int,Eigen::MatrixXd>	&,
+							double &) = 0;
 };
+#endif
