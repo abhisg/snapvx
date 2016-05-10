@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <unordered_map>
+#include <thread>
 
 class ADMM
 {
@@ -48,8 +49,8 @@ class ADMM
 		ADMM();
 		//void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
 		//void LoadEdges(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
-		void LoadNodeProximal(ProximalOperator, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::map<std::string,Eigen::MatrixXd> >  &);
-		void LoadEdgeProximal(ProximalOperator,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
+		void LoadNodeProximal(std::string, std::vector<int> &,std::vector<std::string>&,std::vector<std::vector<int> >  &,std::vector<int>  &,std::vector<std::map<std::string,Eigen::MatrixXd> >  &);
+		void LoadEdgeProximal(std::string,std::vector<int>,std::vector<int>&,std::vector<int>&,std::vector<int>&,int);
 		void Solve(double,double,double,double);
 		void PrintSolution();
 		

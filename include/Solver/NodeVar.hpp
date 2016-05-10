@@ -1,6 +1,6 @@
 #ifndef NODEVAR_H_
 #define NODEVAR_H_
-#include "CVXcanon/src/CVXcanon.hpp"
+#include "../CVXcanon/src/CVXcanon.hpp"
 #include <string>
 
 typedef struct Node_Var

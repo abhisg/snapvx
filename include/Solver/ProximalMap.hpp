@@ -1,43 +1,39 @@
 #ifndef PROXIMAL_MAP_H_
 #define PROXIMAL_MAP_H_
 
-#include <unordered_map>
+#include <map>
+#include <string>
 #include "Node.hpp"
 #include "Edge.hpp"
 #include "Square.hpp"
 #include "ModSquare.hpp"
 #include "NetLasso.hpp"
 
-typedef enum ProximalOperator
-{
-        SQUARE,
-        MOD_SQUARE,
-        NETLASSO,
-        NONE
-}ProximalOperator;
+template<typename T> Node * createNodeInstance() { return new T; }
+template<typename T> Edge * createEdgeInstance() { return new T; }
 
 //include all the solver functions here
+class ProximalMap{
+protected:
 
-//static map for node objectives
-template<typename T> Node * createNodeInstance() { return new T; }
-typedef std::map<ProximalOperator, Node*(*)()> node_map_type;
-node_map_type nodemap;
-nodemap[SQUARE] = &createInstance<Square>;
-nodemap[MOD_SQUARE] = &createInstance<ModSquare>;
+	//static map for node objectives
+	static std::map<std::string, Node*(*)()> node_map;
+	static std::map<std::string, Edge*(*)()> edge_map;
 
-//static map for edge objectives
-template<typename T> Edge * createNodeInstance() { return new T; }
-typedef std::map<ProximalOperator, Edge*(*)()> node_map_type;
-edge_map_type edgemap;
-edgemap[NETLASSO] = &createInstance<NetLasso>;
+public:
+	static void LoadOperators(){
+		node_map["SQUARE"] = &createNodeInstance<Square>;
+		node_map["MOD_SQUARE"] = &createNodeInstance<ModSquare>;
+		edge_map["NETLASSO"] = &createEdgeInstance<NetLasso>;
+	}
 
+	static Node *getNodeInstance(std::string op){
+		return node_map[op]();
+	}
 
-Node *getNodeInstance(ProximalOperator op){
-	return nodemap[op];
-}
-
-Edge *getEdgeInstance(ProximalOperator op){
-	return edgemap[op];
-}
+	static Edge *getEdgeInstance(std::string op){
+		return edge_map[op]();
+	}
+};
 #endif
 

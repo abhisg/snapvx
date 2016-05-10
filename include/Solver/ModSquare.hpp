@@ -1,11 +1,12 @@
+#ifndef MODSQUARE_H_
+#define MODSQUARE_H_
 #include "Node.hpp"
 
-class Square : public Node
-{
+class ModSquare : public Node{
 public:
-	Square():Node(){}
+	ModSquare():Node(){}
 
-	void ADMM_node(std::unordered_map<int,Node_Var> &node_x_vals,
+	virtual void ADMM_node(std::unordered_map<int,Node_Var> &node_x_vals,
 					std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 					std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,
 					double &rho){
@@ -18,4 +19,5 @@ public:
 			//std::cout<<"x " << node->x_var_idx[j] <<" "<<node_x_vals[node->x_var_idx[j]].value<<"\n";
 		}
 	}
-}
+};
+#endif

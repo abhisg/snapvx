@@ -7,7 +7,7 @@ class Square : public Node
 public:
 	Square():Node(){}
 
-	void ADMM_node(std::unordered_map<int,Node_Var> &node_x_vals,
+	virtual void ADMM_node(std::unordered_map<int,Node_Var> &node_x_vals,
 					std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 					std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,
 					double &rho){
