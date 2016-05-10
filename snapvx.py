@@ -615,7 +615,7 @@ class TGraphVX(TUNGraph):
             varId_i = [varId for (varId,_,_,_) in info_i[X_VARS]]
             varId_j = [varId for (varId,_,_,_) in info_j[X_VARS]]
             #print [varID for (varID, varName, var, offset) in itertools.product(info_i[X_VARS],info_j[X_VARS])]
-            if len(varId_i) != 1 or len(varId_j) != 1:
+            if __builtin__.len(varId_i) != 1 or __builtin__.len(varId_j) != 1:
                 current_node_var_idx = PairVector([IntPair(node_vars_map[elem_i],\
                                      node_vars_map[elem_j]) \
                                     for(elem_i,elem_j) \
