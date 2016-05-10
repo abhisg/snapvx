@@ -1,49 +1,15 @@
 #ifndef ADMM_H
 #define ADMM_H
 
-#include "CVXcanon/src/CVXcanon.hpp"
+#include "Solver/Node.hpp"
+#include "Solver/Edge.hpp"
+#include "Solver/NodeVar.hpp"
 #include "CVXcanon/include/Eigen/Sparse"
 #include "CVXcanon/include/Eigen/Core"
 #include <unordered_map>
 #include <string>
 #include <utility>
 #include <unordered_map>
-
-typedef enum ProximalOperator
-{
-	SQUARE,
-	MOD_SQUARE,
-	NETLASSO,
-	NONE
-}ProximalOperator;
-
-typedef struct Node 
-{
-	LinOp* node_objective;
-	std::vector<LinOp *> node_constraints;
-	std::vector<std::vector<int> > neighbour_var_idx;
-	std::vector<int> x_var_idx;
-	std::vector<std::map<std::string,Eigen::MatrixXd> > args;
-}Node;
-
-typedef struct Edge
-{
-	LinOp* edge_objective;
-	std::vector<LinOp *> edge_constraints;
-	/*std::vector<std::pair<int,int> > edge_var_idx;
-	std::vector<std::pair<int,int> > node_var_idx;*/
-	std::vector<int> edge_var_idx_left;
-	std::vector<int> edge_var_idx_right;
-	std::vector<int> node_var_idx_left;
-	std::vector<int> node_var_idx_right;
-}Edge;
-
-typedef struct Node_Var
-{
-	Eigen::MatrixXd value;
-	std::string name;
-	int nodeId;
-}Node_Var;
 
 class ADMM
 {
@@ -61,9 +27,6 @@ class ADMM
 		std::unordered_map<int,Node_Var> node_x_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_z_vals;
 		std::unordered_map<int,Eigen::MatrixXd> edge_u_vals;
-		/*std::vector<Node_Var> node_x_vals;
-		std::vector<Eigen::MatrixXd> edge_z_vals;
-		std::vector<Eigen::MatrixXd> edge_u_vals;*/
 		ProximalOperator edge_prox;
 		ProximalOperator node_prox;
 		int prox_edge_arg;
@@ -81,8 +44,8 @@ class ADMM
 		double eps_rel;
 
 		//solver functions
-		void ADMM_node(Node *);
-		void ADMM_edge(Edge *,double&,double&,double&,double&,double&);
+		//void ADMM_node(Node *);
+		//void ADMM_edge(Edge *,double&,double&,double&,double&,double&);
 	public:
 		ADMM();
 		void LoadNodes(std::vector<LinOp* > &,std::vector<std::vector< LinOp *> > &);
