@@ -584,6 +584,7 @@ class TGraphVX(TUNGraph):
             etup = self.__GetEdgeTup(ei.GetSrcNId(), ei.GetDstNId())
             info_i = node_info[etup[0]]
             info_j = node_info[etup[1]]
+            operator = self.edge_proximalOperator[etup]
             if UseSlowADMM == True:
                 obj = self.edge_objectives[etup]
                 con = self.edge_constraints[etup]
@@ -664,7 +665,7 @@ class TGraphVX(TUNGraph):
                         current_edge_var_idx.push_back(pair_edge)"""
             #node_var_idx.push_back(current_node_var_idx)
             #edge_var_idx.push_back(current_edge_var_idx)
-            self.ADMM_obj.LoadEdgeProximal(NETLASSO,current_edge_var_idx_left,current_edge_var_idx_right,current_node_var_idx_left,current_node_var_idx_right,0)
+            self.ADMM_obj.LoadEdgeProximal(operator,current_edge_var_idx_left,current_edge_var_idx_right,current_node_var_idx_left,current_node_var_idx_right,0)
             current_node_var_idx_left.clear()
             current_node_var_idx_right.clear()
             current_edge_var_idx_left.clear()
@@ -744,10 +745,10 @@ class TGraphVX(TUNGraph):
                 current_node_edge_vars.push_back(current_edge_vars)
             for j in xrange(__builtin__.len(node_args)):
                 #print operator
-                if operator == SQUARE:
+                if operator == "SQUARE":
                     #argument["a"] = numpyToVector(numpy.array(node_args[j]['a']))
                     argument["a"] = numpy.array(node_args[j]['a'])
-                elif operator == MOD_SQUARE:
+                elif operator == "MOD_SQUARE":
                     b = numpy.array(node_args[j]['b'],'d')
                     mat = numpy.identity(b.shape[0]) * (node_args[j]['mu']+rho*info[X_DEG]/2.)
                     mat[-1,-1] -= node_args[j]['mu']
@@ -959,7 +960,7 @@ class TGraphVX(TUNGraph):
         self.node_constraints[NId] = Constraints
         return TUNGraph.AddNode(self, NId)
     
-    def AddNodeProximal(self,NId,proximalVariables,proximalArgs={},proximalOperator=SQUARE):
+    def AddNodeProximal(self,NId,proximalVariables,proximalArgs={},proximalOperator="SQUARE"):
         self.node_objectives[NId] = __default_objective
         self.node_constraints[NId] = __default_constraints
         self.node_variables[NId] = [(var.id,var.name(),var,0) \
@@ -979,7 +980,7 @@ class TGraphVX(TUNGraph):
         self.node_objectives[NId] = Objective
         self.node_variables[NId] = self.__ExtractVariableList(Objective)
 
-    def SetNodeProximalArgs(self,NId,proximalVariables,proximalArgs={},proximalOperator=MOD_SQUARE):
+    def SetNodeProximalArgs(self,NId,proximalVariables,proximalArgs={},proximalOperator="MOD_SQUARE"):
         self.__VerifyNId(NId)
         self.node_variables[NId] = [(var.id,var.name(),var,0) \
                                     for var in sorted(proximalVariables,key=lambda t:t.name())]
@@ -1042,7 +1043,7 @@ class TGraphVX(TUNGraph):
             self.edge_constraints[ETup] = Constraints
         return TUNGraph.AddEdge(self, SrcNId, DstNId)
     
-    def AddEdgeProximal(self,SrcNId,DstNId,proximalOperator=MOD_SQUARE,proximalArgs=None):
+    def AddEdgeProximal(self,SrcNId,DstNId,proximalOperator="MOD_SQUARE",proximalArgs=None):
         ETup = self.__GetEdgeTup(SrcNId, DstNId)
         self.edge_proximalOpearator[ETup] = proximalOperator
         self.edge_proximalArgs[ETup] = {}
@@ -1060,7 +1061,7 @@ class TGraphVX(TUNGraph):
         self.__VerifyEdgeTup(ETup)
         self.edge_objectives[ETup] = Objective
     
-    def SetEdgeProximalArgs(self,SrcNId,DstNId,proximalOperator=NETLASSO,proximalArgs=None):
+    def SetEdgeProximalArgs(self,SrcNId,DstNId,proximalOperator="NETLASSO",proximalArgs=None):
         ETup = self.__GetEdgeTup(SrcNId, DstNId)
         self.__VerifyEdgeTup(ETup)
         self.edge_proximalOperator[ETup] = proximalOperator

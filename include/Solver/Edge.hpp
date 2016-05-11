@@ -3,6 +3,7 @@
 #include "../CVXcanon/src/CVXcanon.hpp"
 #include "NodeVar.hpp"
 #include <vector>
+#include <unordered_map>
 
 class Edge
 {
