@@ -5,9 +5,15 @@
 #include <string>
 #include "Node.hpp"
 #include "Edge.hpp"
+
+//node solvers
 #include "Square.hpp"
 #include "ModSquare.hpp"
+#include "NetLaplace.hpp"
+
+//edge solvers
 #include "NetLasso.hpp"
+#include "EdgeLasso.hpp"
 
 template<typename T> Node * createNodeInstance() { return new T; }
 template<typename T> Edge * createEdgeInstance() { return new T; }
@@ -23,15 +29,26 @@ public:
 	static void LoadOperators(){
 		node_map["SQUARE"] = &createNodeInstance<Square>;
 		node_map["MOD_SQUARE"] = &createNodeInstance<ModSquare>;
+		node_map["NETLAPLACE"] = &createNodeInstance<NetLaplace>
 		edge_map["NETLASSO"] = &createEdgeInstance<NetLasso>;
+		edge_map["EDGELASSO"] = &createEdgeInstance<EdgeLasso>;
 	}
 
 	static Node *getNodeInstance(std::string op){
-		return node_map[op]();
+		if ( node_map.find(op) != node_map.end() ){
+			return node_map[op]();
+		else{
+			return NULL;
+		}
 	}
 
 	static Edge *getEdgeInstance(std::string op){
-		return edge_map[op]();
+		if ( edge_map.find(op) != edge_map.end() ){
+			return edge_map[op]();
+		}
+		else{
+			return NULL;
+		}
 	}
 };
 #endif

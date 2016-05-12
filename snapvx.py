@@ -722,7 +722,8 @@ class TGraphVX(TUNGraph):
         #x_var_sizes = IntVector2D()
         #neighbour_var_idx = IntVector3D();
         current_node_vars = IntVector()
-        current_node_vars_sizes = IntVector()
+        current_node_vars_sizes_i = IntVector()
+        current_node_vars_sizes_j = IntVector()
         current_node_varnames = StringVector()
         current_node_edge_vars = IntVector2D()
         start = time.time()
@@ -737,36 +738,32 @@ class TGraphVX(TUNGraph):
             for (varID, varName, var, offset) in info[X_VARS]:
                 current_node_vars.push_back(node_vars_map[varID])
                 current_node_varnames.push_back(varName)
-                current_node_vars_sizes.push_back(var.size[0])
+                current_node_vars_sizes_i.push_back(var.size[0])
+                current_node_vars_sizes_j.push_back(var.size[1])
                 current_edge_vars = IntVector([edge_vars_map[(varID,info[X_NEIGHBORS][i])] for i in xrange(info[X_DEG])])
-                #for i in xrange(info[X_DEG]):
-                #    neighborId = info[X_NEIGHBORS][i]
-                #    current_edge_vars.push_back(edge_vars_map[(varID,nid,neighborId)])
                 current_node_edge_vars.push_back(current_edge_vars)
             for j in xrange(__builtin__.len(node_args)):
-                #print operator
                 if operator == "SQUARE":
-                    #argument["a"] = numpyToVector(numpy.array(node_args[j]['a']))
                     argument["a"] = numpy.array(node_args[j]['a'])
                 elif operator == "MOD_SQUARE":
                     b = numpy.array(node_args[j]['b'],'d')
                     mat = numpy.identity(b.shape[0]) * (node_args[j]['mu']+rho*info[X_DEG]/2.)
                     mat[-1,-1] -= node_args[j]['mu']
-                    #print mat
                     mat += numpy.outer(b,b)
-                    #argument["lhs"] = numpyToMatrix(numpy.linalg.inv(mat).astype('d'))
-                    #argument["rhs"] = numpyToVector(b*node_args[j]['y'])
                     argument["lhs"] = numpy.linalg.inv(mat).astype('d')
                     argument["rhs"] = b*node_args[j]['y']
-                    #print numpy.linalg.inv(mat).astype('d'),b*node_args[j]['y'],node_args[j]['mu']
+                elif operator == "NETLAPLACE":
+                    argument["A"] = numpy.array(node_args[j]['a'])
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(operator,current_node_vars\
                                            ,current_node_varnames\
                                            ,current_node_edge_vars\
-                                           ,current_node_vars_sizes\
+                                           ,current_node_vars_sizes_i\
+                                           ,current_node_vars_sizes_j\
                                            ,proximal_args)
             current_node_vars.clear()
-            current_node_vars_sizes.clear()
+            current_node_vars_sizes_i.clear()
+            current_node_vars_sizes_j.clear()
             current_node_varnames.clear()
             current_node_edge_vars.clear()
             proximal_args.clear()

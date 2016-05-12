@@ -20,6 +20,7 @@ public:
 		Eigen::MatrixXd Theta(d+1,d+1);
 		Eigen::MatrixXd Z(d+1,d+1);
 		Eigen::MatrixXd U(d+1,d+1);
+		Eigen::MatrixXd A(d+1,d+1);
 		int i = 0;
 		for ( int j = 0; j < p; ++j ){
 			int m = edge_z_vals[this->neighbour_var_idx[j][0]].rows();
@@ -27,6 +28,8 @@ public:
 			Z.block(0,i,m,1) = edge_z_vals[this->neighbour_var_idx[j][0]];
 			U.block(i,0,1,m) = edge_u_vals[this->neighbour_var_idx[j][0]].transpose();
 			U.block(0,i,m,1) = edge_u_vals[this->neighbour_var_idx[j][0]];
+			A.block(i,0,1,m) = this->args[j]["A"].transpose();
+			A.block(0,i,m,1) = this->args[j]["A"];
 			i += m;
 		}
 		i=0,k=0;
@@ -35,13 +38,18 @@ public:
 			int n = edge_z_vals[this->neighbour_var_idx[j][0]].cols();
 			Z.block(i,k,m,n) = edge_z_vals[this->neighbour_var_idx[j][0]];
 			U.block(i,k,m,n) = edge_u_vals[this->neighbour_var_idx[j][0]];
+			A.block(i,k,m,n) = this->args[j]["A"];
 			i += m;
 			k += n;
 		}
-		Eigen::EigenSolver<Eigen::MatrixXd> es((Z-U+(Z-U).transpose())/2.0);
-		Eigen::MatrixXd D = es.eigenvalues().asDiagonal();
-		Eigen::MatrixXd Q = es.eigenvectors();
-		Theta = 1/(2*rho)*Q(D+(square(D)+4*rho*Eigen::MatrixXd::Identity(d+1,d+1)).sqrt())*Q.transpose();
+		Eigen::EigenSolver decomp((Z-U+Z.transpose()-U.transpose())/2-A);
+		MatrixXcd lambda = decomp.eigenvalues();
+		for (int i = 0; i < lambda.row(); ++i ){
+			lambda(i,0) += sqrt(lambda(i,0) * lambda(i,0) + 4*rho);
+		}
+		Eigen::MatrixXd D = lambda.asDiagonal().real();
+		Eigen::MatrixXd Q = es.eigenvectors().real();
+		Theta = 1/(2*rho)*Q*D*Q.transpose();
 		i = 0;
 		for ( int j = 0; j < p; ++j){
 			int m = node_x_vals[this->x_var_idx[j]].rows();
