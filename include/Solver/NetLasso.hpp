@@ -12,12 +12,12 @@ public:
 		this->lambda = lambda;
 	}
 
-	virtual std::vector<double> ADMM_edge(std::unordered_map<int,Node_Var> &node_x_vals,
+	virtual void ADMM_edge(std::unordered_map<int,Node_Var> &node_x_vals,
 				std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 				std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,
 				double &rho){
 		//std::vector<double> norms(5,0);
-		SaveState(node_x_vals,edge_z_vals,edge_u_vals);
+		//SaveState(node_x_vals,edge_z_vals,edge_u_vals);
 		for ( int j = 0 ; j < this->edge_var_idx_left.size(); ++j ){
 			if ( this->edge_var_idx_left[j] != 0 || this->edge_var_idx_right[j] != 0 ){
 				Eigen::MatrixXd z_ij = edge_z_vals[this->edge_var_idx_left[j]];
@@ -44,7 +44,7 @@ public:
 					edge_u_vals[this->edge_var_idx_right[j]].squaredNorm());*/
 			}
 		}
-		return CalculateNorms(node_x_vals,edge_z_vals,edge_u_vals);
+		//return CalculateNorms(node_x_vals,edge_z_vals,edge_u_vals);
 	}
 };
 #endif

@@ -113,7 +113,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 			#pragma omp parallel for schedule(dynamic, 64) reduction(+:primal_res,dual_res,xnorm,unorm,znorm)
 		#endif
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
-			std::vector<double> norms = edge_list[i]->ADMM_edge(node_x_vals,edge_z_vals,edge_u_vals,rho);
+			std::vector<double> norms = edge_list[i]->ADMM_edge_solver(node_x_vals,edge_z_vals,edge_u_vals,rho);
 			primal_res += norms[0];
 			dual_res += norms[1];
 			znorm += norms[2];

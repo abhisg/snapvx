@@ -1,6 +1,7 @@
 #ifndef NODE_H_
 #define NODE_H_
 #include "../CVXcanon/src/CVXcanon.hpp"
+#include "../CVXcanon/include/Eigen/Eigenvalues"
 #include "NodeVar.hpp"
 #include <unordered_map>
 #include <vector>
