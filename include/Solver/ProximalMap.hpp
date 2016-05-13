@@ -29,7 +29,7 @@ public:
 	static void LoadOperators(){
 		node_map["SQUARE"] = &createNodeInstance<Square>;
 		node_map["MOD_SQUARE"] = &createNodeInstance<ModSquare>;
-		node_map["NETLAPLACE"] = &createNodeInstance<NetLaplace>
+		node_map["NETLAPLACE"] = &createNodeInstance<NetLaplace>;
 		edge_map["NETLASSO"] = &createEdgeInstance<NetLasso>;
 		edge_map["EDGELASSO"] = &createEdgeInstance<EdgeLasso>;
 	}
@@ -37,6 +37,7 @@ public:
 	static Node *getNodeInstance(std::string op){
 		if ( node_map.find(op) != node_map.end() ){
 			return node_map[op]();
+		}
 		else{
 			return NULL;
 		}

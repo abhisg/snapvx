@@ -8,17 +8,7 @@ libSolver.a: $(SOLVER_OBJS)
 	ranlib $@
 
 
-Edge.o: Edge.hpp
-	g++ $(CFLAGS) -c $< -o $@
-ModSquare.o: ModSquare.hpp
-	g++ $(CFLAGS) -c $< -o $@
-NetLasso.o: NetLasso.hpp
-	g++ $(CFLAGS) -c $< -o $@
-Node.o: Node.hpp
-	g++ $(CFLAGS) -c $< -o $@
-Square.o: Square.hpp
-	g++ $(CFLAGS) -c $< -o $@
-ProximalMap.o: ProximalMap.hpp
+%.o: %.hpp
 	g++ $(CFLAGS) -c $< -o $@
 
 .PHONY:clean

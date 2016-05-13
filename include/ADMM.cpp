@@ -61,12 +61,12 @@ void ADMM::LoadNodeProximal(std::string prox,std::vector<int>  &x_var_idx,
 		newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();
 		for ( int j = 0 ; j < x_var_idx.size(); ++j){
 			node_x_vals[x_var_idx[j]] = {Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0),x_var_names[j],0};
-			size_x += sizes_i[j];
+			size_x += sizes_i[j]*sizes_j[j];
+			size_z += (sizes_i[j]*sizes_j[j])*neighbour_var_idx[j].size();
 			z_var_size += neighbour_var_idx[j].size();
 			for ( int k = 0 ; k < neighbour_var_idx[j].size(); ++k){
 				edge_u_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
 				edge_z_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
-				size_z += sizes_i[j];
 			}
 			newnode->args.push_back(args[j]);
 		}
@@ -98,7 +98,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 	this->eps_abs = eps_abs;
 	this->eps_rel = eps_rel;
 	this->lambda = lambda;
-	for(int iter = 0 ; iter <= 250; ++iter){
+	for(int iter = 0 ; iter <= 2500; ++iter){
 		double primal_res = 0;
 		double dual_res = 0;
 		double xnorm = 0;
@@ -143,7 +143,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 
 void ADMM::PrintSolution()
 {
-	for(int i = 0 ; i < x_var_size; ++ i){
+	for(int i = 0 ; i < x_var_size; ++i){
 		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
 	}
 }

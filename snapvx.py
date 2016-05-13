@@ -617,7 +617,7 @@ class TGraphVX(TUNGraph):
             varId_j = [varId for (varId,_,_,_) in info_j[X_VARS]]
             #print [varID for (varID, varName, var, offset) in itertools.product(info_i[X_VARS],info_j[X_VARS])]
             if __builtin__.len(varId_i) != 1 or __builtin__.len(varId_j) != 1:
-                current_node_var_idx = PairVector([IntPair(node_vars_map[elem_i],\
+                """current_node_var_idx_left = PairVector([IntPair(node_vars_map[elem_i],\
                                      node_vars_map[elem_j]) \
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
@@ -626,7 +626,13 @@ class TGraphVX(TUNGraph):
                                      edge_vars_map[(elem_j,etup[0])]) \
                                     for(elem_i,elem_j) \
                                     in list(itertools.product(varId_i,varId_j))
-                                    if (elem_i,elem_j) in edge_proximal_args])
+                                    if (elem_i,elem_j) in edge_proximal_args])"""
+                for (elem_i,elem_j) in list(itertools.product(varId_i,varId_j)):
+                    if (elem_i,elem_j) in edge_proximal_args:
+                        current_node_var_idx_left.push_back(node_vars_map[elem_i])
+                        current_node_var_idx_right.push_back(node_vars_map[elem_j])
+                        current_edge_var_idx_left.push_back(edge_vars_map[(elem_i,etup[1])])
+                        current_edge_var_idx_right.push_back(edge_vars_map[(elem_j,etup[0])])
             else:
                 #try:
                     varId_i_node,varId_j_node,varId_i_edge,varId_j_edge = node_vars_map[varId_i[0]],\
@@ -753,6 +759,7 @@ class TGraphVX(TUNGraph):
                     argument["lhs"] = numpy.linalg.inv(mat).astype('d')
                     argument["rhs"] = b*node_args[j]['y']
                 elif operator == "NETLAPLACE":
+                    print numpy.array(node_args[j]['a'],'d')
                     argument["A"] = numpy.array(node_args[j]['a'])
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(operator,current_node_vars\
@@ -979,10 +986,12 @@ class TGraphVX(TUNGraph):
 
     def SetNodeProximalArgs(self,NId,proximalVariables,proximalArgs={},proximalOperator="MOD_SQUARE"):
         self.__VerifyNId(NId)
-        self.node_variables[NId] = [(var.id,var.name(),var,0) \
-                                    for var in sorted(proximalVariables,key=lambda t:t.name())]
+        #self.node_variables[NId] = [(var.id,var.name(),var,0) \
+        #                            for var in sorted(proximalVariables,key=lambda t:t.name())]
+        self.node_variables[NId] = [(var.id,var.name(),var,0) for var in proximalVariables]
         self.node_proximalArgs[NId] = []
-        for var in sorted(proximalVariables,key=lambda t:t.name()):
+        #for var in sorted(proximalVariables,key=lambda t:t.name()):
+        for var in proximalVariables:
             if var in proximalArgs:
                 self.node_proximalArgs[NId].append(proximalArgs[var])
             else:
