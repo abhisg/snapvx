@@ -8,10 +8,6 @@ protected:
 public:
 	NetLasso():Edge(){lambda=1.0;}
 
-	void SetLambda(double lambda){
-		this->lambda = lambda;
-	}
-
 	virtual void ADMM_edge(std::unordered_map<int,Node_Var> &node_x_vals,
 				std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 				std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,

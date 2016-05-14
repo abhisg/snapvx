@@ -51,7 +51,7 @@ void ADMM::LoadNodeProximal(std::string prox,std::vector<int>  &x_var_idx,
 				std::vector<std::map<std::string,Eigen::MatrixXd > >  &args)
 {
 	//need zij and uij for all neighbours of i
-	x_var_size += x_var_idx.size();	
+	x_var_size += x_var_idx.size();
 	Node *newnode = ProximalMap::getNodeInstance(prox);
 	if ( newnode != NULL){
 		newnode->node_objective = NULL;
@@ -98,7 +98,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 	this->eps_abs = eps_abs;
 	this->eps_rel = eps_rel;
 	this->lambda = lambda;
-	for(int iter = 0 ; iter <= 2500; ++iter){
+	for(int iter = 0 ; iter <= 250; ++iter){
 		double primal_res = 0;
 		double dual_res = 0;
 		double xnorm = 0;
@@ -121,6 +121,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 		for ( int i = 0 ; i < edge_list.size(); ++i ){
 			std::vector<double> norms(5,0);
 			if ( edge_list[i] ){
+				edge_list[i]->SetLambda(lambda);
 			 	norms = edge_list[i]->ADMM_edge_solver(node_x_vals,edge_z_vals,edge_u_vals,rho);
 			}
 			primal_res += norms[0];

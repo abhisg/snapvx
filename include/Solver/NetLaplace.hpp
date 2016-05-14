@@ -23,6 +23,7 @@ public:
 		Eigen::MatrixXd A(d,d);
 		Z.block(0,0,1,1) = edge_z_vals[this->neighbour_var_idx[0][0]];
 		U.block(0,0,1,1) = edge_u_vals[this->neighbour_var_idx[0][0]];
+		A.block(0,0,1,1) = this->args[0]["A"];
 		int i = 1,k = 1;
 		for ( int j = 1; j < p + 1; ++j ){
 			int m = edge_z_vals[this->neighbour_var_idx[j][0]].rows();
@@ -49,22 +50,23 @@ public:
 				i++;
 			}
 		}
-		std::cout << "A" << A << "\n";
-		Eigen::EigenSolver<Eigen::MatrixXd> decomp(rho*((Z-U+Z.transpose()-U.transpose())/2)-A);
-		Eigen::MatrixXcd lambda = decomp.eigenvalues();
+		//std::cout << "A: " << A << "\n";
+		//std::cout << "matrix: " << rho*((Z-U+Z.transpose()-U.transpose())/2)-A << "\n";
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> decomp(rho*(Z-U)-A);
+		Eigen::VectorXd lambda = decomp.eigenvalues();
 		for (int i = 0; i < lambda.rows(); ++i ){
-			lambda(i,0) += sqrt(lambda(i,0) * lambda(i,0) + 4*rho);
+			lambda(i,0) = (lambda(i,0)+sqrt(lambda(i,0) * lambda(i,0) + 4*rho))/(2*rho);
 		}
-		Eigen::MatrixXd D = lambda.real().asDiagonal();
-		Eigen::MatrixXd Q = decomp.eigenvectors().real();
-		Theta = 1/(2*rho)*Q*D*Q.transpose();
-		//std::cout << "Theta " << Theta << "\n";
+		Eigen::MatrixXd D = lambda.asDiagonal();
+		Eigen::MatrixXd Q = decomp.eigenvectors();
+		Theta = Q*D*Q.transpose();
+		std::cout << "Theta " << Theta << "\n";
 		node_x_vals[this->x_var_idx[0]].value = Theta.block(0,0,1,1);
 		i = 1;
 		for ( int j = 1; j < p + 1; ++j){
 			int m = node_x_vals[this->x_var_idx[j]].value.rows();
 			node_x_vals[this->x_var_idx[j]].value = Theta.block(i,0,m,1);
-			std::cout << "x " << this->x_var_idx[j] << " " << m << " " << node_x_vals[this->x_var_idx[j]].value << "\n";
+			//std::cout << "x " << this->x_var_idx[j] << " " << m << " " << node_x_vals[this->x_var_idx[j]].value << "\n";
 			i += m;
 		}
 		i=p+1;
@@ -76,7 +78,7 @@ public:
 				int n = edge_z_vals[this->neighbour_var_idx[i][0]].cols();
 				node_x_vals[this->x_var_idx[i]].value = Theta.block(lr[k-1],lc,m,n);
 				lr[k-1] += m;
-				std::cout << "x " << this->x_var_idx[i] << " " << m << " " << n << " " << lr[k-1] << " " << lc << " " << node_x_vals[this->x_var_idx[i]].value << "\n";
+				//std::cout << "x " << this->x_var_idx[i] << " " << m << " " << n << " " << lr[k-1] << " " << lc << " " << node_x_vals[this->x_var_idx[i]].value << "\n";
 				lc += n;
 				i++;
 			}
