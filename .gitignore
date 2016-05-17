@@ -7,3 +7,6 @@
 # Output files
 build/
 *.out
+
+*.o
+*.a

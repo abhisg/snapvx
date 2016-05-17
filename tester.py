@@ -4,7 +4,7 @@ import numpy as np
 
 np.random.seed(1)
 num_nodes = 50
-num_edges = 100
+num_edges = 1000
 n = 2
 snapGraph = GenRndGnm(PUNGraph, num_nodes, num_edges)
 gvx = TGraphVX(snapGraph,use_proximal_updates=True)
@@ -17,13 +17,13 @@ for i in range(num_nodes):
 	y = np.random.randint(0,2)
   	#gvx.SetNodeObjective(i, square(norm(x-a)))
 	#gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'a':b}},proximalOperator=SQUARE)
-	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'b':b,'mu':mu,'y':y}},proximalOperator=MOD_SQUARE)
+	gvx.SetNodeProximalArgs(i,[x],proximalArgs={x:{'b':b,'mu':mu,'y':y}},proximalOperator="MOD_SQUARE")
 #def netLasso(src, dst, data):
 #	return (norm(src['x'] - dst['x'],2), [])
 #gvx.AddEdgeObjectives(netLasso)
 for edge in gvx.Edges():
 	etup = edge.GetSrcNId(), edge.GetDstNId()
-	gvx.SetEdgeProximalArgs(etup[0],etup[1])
+	gvx.SetEdgeProximalArgs(etup[0],etup[1],proximalOperator="NETLASSO")
 	
 
 """#Create new graph
