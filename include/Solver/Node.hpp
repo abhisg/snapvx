@@ -28,5 +28,22 @@ class Node
 						std::unordered_map<int,Eigen::MatrixXd> &,
 						std::unordered_map<int,Eigen::MatrixXd>	&,
 						double &) = 0;
+
+		virtual void LoadNodeProximal(std::vector<int>  &x_var_idx,
+									std::vector<std::vector<int> >  &neighbour_var_idx,
+									std::vector<int>  &sizes_i,
+									std::vector<int>  &sizes_j,
+									std::vector<std::map<std::string,Eigen::MatrixXd > >  &args)
+		{
+			this->node_objective = NULL;
+			this->node_constraints = std::vector<LinOp *>();
+			this->neighbour_var_idx = neighbour_var_idx;
+			this->x_var_idx = x_var_idx;
+			this->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();
+			for ( int j = 0 ; j < static_cast<int>(x_var_idx.size()); ++j){
+				this->args.push_back(args[j]);
+			}
+			std::cout<<"Inside parent func\n";
+		}
 };
 #endif

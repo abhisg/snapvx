@@ -54,21 +54,22 @@ void ADMM::LoadNodeProximal(std::string prox,std::vector<int>  &x_var_idx,
 	x_var_size += x_var_idx.size();
 	Node *newnode = ProximalMap::getNodeInstance(prox);
 	if ( newnode != NULL){
-		newnode->node_objective = NULL;
+		/*newnode->node_objective = NULL;
 		newnode->node_constraints = std::vector<LinOp *>();
 		newnode->neighbour_var_idx = neighbour_var_idx;
 		newnode->x_var_idx = x_var_idx;
-		newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();
-		for ( int j = 0 ; j < x_var_idx.size(); ++j){
+		newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();*/
+		newnode->LoadNodeProximal(x_var_idx,neighbour_var_idx,sizes_i,sizes_j,args);
+		for ( int j = 0 ; j < static_cast<int>(x_var_idx.size()); ++j){
 			node_x_vals[x_var_idx[j]] = {Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0),x_var_names[j],0};
 			size_x += sizes_i[j]*sizes_j[j];
 			size_z += (sizes_i[j]*sizes_j[j])*neighbour_var_idx[j].size();
 			z_var_size += neighbour_var_idx[j].size();
-			for ( int k = 0 ; k < neighbour_var_idx[j].size(); ++k){
+			for ( int k = 0 ; k < static_cast<int>(neighbour_var_idx[j].size()); ++k){
 				edge_u_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
 				edge_z_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
 			}
-			newnode->args.push_back(args[j]);
+			//newnode->args.push_back(args[j]);
 		}
 	}
 	node_list.push_back(newnode);
@@ -98,7 +99,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 	this->eps_abs = eps_abs;
 	this->eps_rel = eps_rel;
 	this->lambda = lambda;
-	for(int iter = 0 ; iter <= 250; ++iter){
+	for(int iter = 0 ; iter <= 20000; ++iter){
 		double primal_res = 0;
 		double dual_res = 0;
 		double xnorm = 0;
@@ -108,7 +109,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 		#if defined(_OPENMP)
 			#pragma omp parallel for schedule(dynamic, 32)
 		#endif
-		for ( int i = 0 ; i < node_list.size(); ++i ){
+		for ( int i = 0 ; i < static_cast<int>(node_list.size()); ++i ){
 			if ( node_list[i] ){
 				node_list[i]->ADMM_node(node_x_vals,edge_z_vals,edge_u_vals,rho);
 			}
@@ -118,7 +119,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 		#if defined(_OPENMP)
 			#pragma omp parallel for schedule(dynamic, 64) reduction(+:primal_res,dual_res,xnorm,unorm,znorm)
 		#endif
-		for ( int i = 0 ; i < edge_list.size(); ++i ){
+		for ( int i = 0 ; i < static_cast<int>(edge_list.size()); ++i ){
 			std::vector<double> norms(5,0);
 			if ( edge_list[i] ){
 				edge_list[i]->SetLambda(lambda);
@@ -144,7 +145,7 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 
 void ADMM::PrintSolution()
 {
-	for(int i = 0 ; i < x_var_size; ++i){
+	for(int i = 0 ; i < static_cast<int>(x_var_size); ++i){
 		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
 	}
 }

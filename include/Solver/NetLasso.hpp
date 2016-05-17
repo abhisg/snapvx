@@ -14,7 +14,7 @@ public:
 				double &rho){
 		//std::vector<double> norms(5,0);
 		//SaveState(node_x_vals,edge_z_vals,edge_u_vals);
-		for ( int j = 0 ; j < this->edge_var_idx_left.size(); ++j ){
+		for ( int j = 0 ; j < static_cast<int>(this->edge_var_idx_left.size()); ++j ){
 			if ( this->edge_var_idx_left[j] != 0 || this->edge_var_idx_right[j] != 0 ){
 				Eigen::MatrixXd z_ij = edge_z_vals[this->edge_var_idx_left[j]];
 				Eigen::MatrixXd z_ji = edge_z_vals[this->edge_var_idx_right[j]];

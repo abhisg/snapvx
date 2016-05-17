@@ -11,9 +11,9 @@ public:
 					std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 					std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,
 					double &rho){
-		for ( int j = 0 ; j < this->x_var_idx.size(); ++j ){
+		for ( int j = 0 ; j < static_cast<int>(this->x_var_idx.size()); ++j ){
 			Eigen::MatrixXd increment(2*this->args[j]["a"]);
-			for ( int k = 0 ; k < this->neighbour_var_idx[j].size(); ++k ){
+			for ( int k = 0 ; k < static_cast<int>(this->neighbour_var_idx[j].size()); ++k ){
 				increment += rho*(edge_z_vals[this->neighbour_var_idx[j][k]] - edge_u_vals[this->neighbour_var_idx[j][k]]);
 			}
 			node_x_vals[this->x_var_idx[j]].value = increment/(2+rho*this->neighbour_var_idx[j].size());
