@@ -43,7 +43,6 @@ class Node
 			for ( int j = 0 ; j < static_cast<int>(x_var_idx.size()); ++j){
 				this->args.push_back(args[j]);
 			}
-			//std::cout<<"Inside parent func\n";
 		}
 
 		virtual void PrintNodeVariables(std::unordered_map<int,Node_Var> &node_x_vals)

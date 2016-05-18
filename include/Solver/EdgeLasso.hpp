@@ -26,13 +26,11 @@ public:
 														edge_u_vals[this->edge_var_idx_left[i]];
 				}
 				else{
-					for ( int l = 0; l < static_cast<int>(edge_z_vals[this->edge_var_idx_left[i]].cols()); ++l){
-						Eigen::MatrixXd sum = edge_u_vals[this->edge_var_idx_left[i]].col(l) + 
-										node_x_vals[this->node_var_idx_left[i]].value.col(l);
-						double theta = std::max(1-lambda/(sum.norm()*rho),0.0);
-						//std::cout << "sum " << edge_u_vals[this->edge_var_idx_left[i]].col(l) << " " << node_x_vals[this->node_var_idx_left[i]].value.col(l) << " " << "eta " << 1.0/lambda << "\n";
-						edge_z_vals[this->edge_var_idx_left[i]].col(l) = theta * sum ;
-					}
+					Eigen::MatrixXd sum = edge_u_vals[this->edge_var_idx_left[i]] + 
+										node_x_vals[this->node_var_idx_left[i]].value;
+					double theta = std::max(1-lambda/(sum.norm()*rho),0.0);
+					//std::cout << "sum " << edge_u_vals[this->edge_var_idx_left[i]].col(l) << " " << node_x_vals[this->node_var_idx_left[i]].value.col(l) << " " << "eta " << 1.0/lambda << "\n";
+					edge_z_vals[this->edge_var_idx_left[i]] = theta * sum ;
 				}
 				//std::cout << "z " << this->edge_var_idx_left[i] << " " << edge_z_vals[this->edge_var_idx_left[i]] << "\n";
 				i++;

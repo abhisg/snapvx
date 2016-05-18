@@ -54,11 +54,6 @@ void ADMM::LoadNodeProximal(std::string prox,std::vector<int>  &x_var_idx,
 	x_var_size += x_var_idx.size();
 	Node *newnode = ProximalMap::getNodeInstance(prox);
 	if ( newnode != NULL){
-		/*newnode->node_objective = NULL;
-		newnode->node_constraints = std::vector<LinOp *>();
-		newnode->neighbour_var_idx = neighbour_var_idx;
-		newnode->x_var_idx = x_var_idx;
-		newnode->args = std::vector<std::map<std::string,Eigen::MatrixXd> >();*/
 		newnode->LoadNodeProximal(x_var_idx,neighbour_var_idx,sizes_i,sizes_j,args);
 		for ( int j = 0 ; j < static_cast<int>(x_var_idx.size()); ++j){
 			node_x_vals[x_var_idx[j]] = {Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0),x_var_names[j],0};
@@ -69,7 +64,6 @@ void ADMM::LoadNodeProximal(std::string prox,std::vector<int>  &x_var_idx,
 				edge_u_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
 				edge_z_vals[neighbour_var_idx[j][k]] = Eigen::MatrixXd::Constant(sizes_i[j],sizes_j[j],0);
 			}
-			//newnode->args.push_back(args[j]);
 		}
 	}
 	node_list.push_back(newnode);
@@ -145,9 +139,6 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 
 void ADMM::PrintSolution()
 {
-	/*for(int i = 0 ; i < static_cast<int>(x_var_size); ++i){
-		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
-	}*/
 	for ( int i = 0 ; i < static_cast<int>(node_list.size()); ++i){
 		if ( node_list[i] != NULL ){
 			std::cout << "Node " << (i+1) << "\n";

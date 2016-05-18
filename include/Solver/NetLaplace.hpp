@@ -94,7 +94,7 @@ public:
 				i++;
 			}
 		}
-		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> decomp(rho*((Z-U+Z.transpose()-U.transpose())/2)-A);
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> decomp(rho*((Z-U)/2)-A);
 		Eigen::VectorXd lambda = decomp.eigenvalues();
 		for (int i = 0; i < lambda.rows(); ++i ){
 			lambda(i,0) = (lambda(i,0)+sqrt(lambda(i,0) * lambda(i,0) + 4*rho))/(2*rho);
