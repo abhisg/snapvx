@@ -127,7 +127,7 @@ public:
 		}
 	}
 
-	virtual void PrintNodeVariables(std::unordered_map<int,Eigen::MatrixXd> &node_x_vals)
+	virtual void PrintNodeVariables(std::unordered_map<int,Node_Var> &node_x_vals)
 	{
 		std::cout << Theta << "\n";
 	}

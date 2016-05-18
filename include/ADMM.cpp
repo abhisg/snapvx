@@ -148,7 +148,7 @@ void ADMM::PrintSolution()
 	/*for(int i = 0 ; i < static_cast<int>(x_var_size); ++i){
 		std::cout <<"Node ID " << node_x_vals[i].nodeId << "\n" << node_x_vals[i].name << " " << node_x_vals[i].value.transpose() << "\n";
 	}*/
-	for ( int i = 0 ; i < static_cast<int>node_list.size(); ++i){
+	for ( int i = 0 ; i < static_cast<int>(node_list.size()); ++i){
 		if ( node_list[i] != NULL ){
 			std::cout << "Node " << (i+1) << "\n";
 			node_list[i]->PrintNodeVariables(node_x_vals);
