@@ -12,7 +12,6 @@ gvx = TGraphVX(snapGraph,use_proximal_updates=True)
 mat = np.random.randn(n+1,100*(n+1))
 mat = np.cov(mat)
 #mat = (mat+mat.T)/2
-print mat
 rho = 1.0
 lamb = 10.0
 """Theta = np.zeros((n+1,n+1))

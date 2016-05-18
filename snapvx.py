@@ -759,7 +759,6 @@ class TGraphVX(TUNGraph):
                     argument["lhs"] = numpy.linalg.inv(mat).astype('d')
                     argument["rhs"] = b*node_args[j]['y']
                 elif operator == "NETLAPLACE":
-                    print numpy.array(node_args[j]['a'],'d')
                     argument["A"] = numpy.array(node_args[j]['a'])
                 proximal_args.push_back(argument)
             self.ADMM_obj.LoadNodeProximal(operator,current_node_vars\
@@ -793,7 +792,6 @@ class TGraphVX(TUNGraph):
         #self.ADMM_obj.LoadNodesProximal(SQUARE,x_var_idx,x_var_names,neighbour_var_idx,x_var_sizes,all_node_args)
         #self.ADMM_obj.LoadEdgesProximal(LASSO,edge_var_idx,node_var_idx,0)
         start = time.time()
-        print rho_param
         self.ADMM_obj.Solve(rho_param, eps_abs, eps_rel, Lambda)
         delta = time.time() - start
         print "Solution time",delta
