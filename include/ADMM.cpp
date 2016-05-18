@@ -135,8 +135,8 @@ void ADMM::Solve(double rho, double eps_abs, double eps_rel, double lambda)
 		//std::cout << "Time difference in z and u = " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() <<std::endl;
 		double e_pri = sqrt(size_x) * eps_abs + eps_rel * sqrt(std::max(xnorm,znorm)) + 0.0001;
 		double e_dual = sqrt(size_z) * eps_abs + eps_rel * sqrt(unorm) * rho + 0.0001;
-		std::cout << "Size " << sqrt(size_z) << " e_abs " << eps_abs << " rho " << rho << " " << " unorm " << sqrt(unorm) << "\n";
-		std::cout << "r: " << sqrt(primal_res) << " e_pri: " << e_pri << " s: " << rho * sqrt(dual_res) << " e_dual: " << e_dual << "\n";
+		//std::cout << "Size " << sqrt(size_z) << " e_abs " << eps_abs << " rho " << rho << " " << " unorm " << sqrt(unorm) << "\n";
+		//std::cout << "r: " << sqrt(primal_res) << " e_pri: " << e_pri << " s: " << rho * sqrt(dual_res) << " e_dual: " << e_dual << "\n";
 		if ( sqrt(primal_res) <= e_pri && rho * sqrt(dual_res) <= e_dual ){
 			break;
 		}

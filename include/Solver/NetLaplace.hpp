@@ -31,7 +31,7 @@ public:
 									std::vector<std::map<std::string,Eigen::MatrixXd > >  &args)
 	{
 		Node::LoadNodeProximal(x_var_idx,neighbour_var_idx,sizes_i,sizes_j,args);
-		std::cout<<"Inside child func\n";
+		//std::cout<<"Inside child func\n";
 		p = static_cast<int>((-1+sqrt(1+4*(this->x_var_idx.size()-1)))/2.0);
 		for ( int j = 0 ; j < p + 1; ++j ){
 			d += sizes_i[j];
@@ -62,7 +62,7 @@ public:
 				i++;
 			}
 		}
-		std::cout << "A: " << A << "\n";
+		//std::cout << "A: " << A << "\n";
 	}
 
 	virtual void ADMM_node(std::unordered_map<int,Node_Var> &node_x_vals,
@@ -118,7 +118,7 @@ public:
 		Eigen::MatrixXd D = lambda.asDiagonal();
 		Eigen::MatrixXd Q = decomp.eigenvectors();
 		Theta = Q*D*Q.transpose();
-		std::cout << "Theta " << Theta << "\n";
+		//std::cout << "Theta " << Theta << "\n";
 		node_x_vals[this->x_var_idx[0]].value = Theta.block(0,0,1,1);
 		i = 1;
 		for ( int j = 1; j < p + 1; ++j){
