@@ -45,5 +45,12 @@ class Node
 			}
 			//std::cout<<"Inside parent func\n";
 		}
+
+		virtual void PrintNodeVariables(std::unordered_map<int,Eigen::MatrixXd> &node_x_vals)
+		{
+			for ( auto &idx:x_var_idx){
+				std::cout << node_x_vals[idx].name << " " << node_x_vals[idx].value.transpose() << "\n";
+			}
+		}
 };
 #endif

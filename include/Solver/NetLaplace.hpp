@@ -69,19 +69,8 @@ public:
 					std::unordered_map<int,Eigen::MatrixXd> &edge_z_vals,
 					std::unordered_map<int,Eigen::MatrixXd>	&edge_u_vals,
 					double &rho){
-		//construct theta,Z and U
-		/*int p = (int)((-1+sqrt(1+4*(this->x_var_idx.size()-1)))/2.0);
-		int d = 0;
-		for ( int j = 0 ; j < p + 1; ++j ){
-			d += node_x_vals[this->x_var_idx[j]].value.rows();
-		}
-		Eigen::MatrixXd Theta(d,d);
-		Eigen::MatrixXd Z(d,d);
-		Eigen::MatrixXd U(d,d);
-		Eigen::MatrixXd A(d,d);*/
 		Z.block(0,0,1,1) = edge_z_vals[this->neighbour_var_idx[0][0]];
 		U.block(0,0,1,1) = edge_u_vals[this->neighbour_var_idx[0][0]];
-		//A.block(0,0,1,1) = this->args[0]["A"];
 		int i = 1;
 		for ( int j = 1; j < p + 1; ++j ){
 			int m = edge_z_vals[this->neighbour_var_idx[j][0]].rows();
@@ -89,8 +78,6 @@ public:
 			Z.block(i,0,m,1) = edge_z_vals[this->neighbour_var_idx[j][0]];
 			U.block(0,i,1,m) = edge_u_vals[this->neighbour_var_idx[j][0]].transpose();
 			U.block(i,0,m,1) = edge_u_vals[this->neighbour_var_idx[j][0]];
-			/*A.block(0,i,1,m) = this->args[j]["A"].transpose();
-			A.block(i,0,m,1) = this->args[j]["A"];*/
 			i += m;
 		}
 		i=p+1;
@@ -102,14 +89,11 @@ public:
 				int n = edge_z_vals[this->neighbour_var_idx[i][0]].cols();
 				Z.block(lr[k-1],lc,m,n) = edge_z_vals[this->neighbour_var_idx[i][0]];
 				U.block(lr[k-1],lc,m,n) = edge_u_vals[this->neighbour_var_idx[i][0]];
-				//A.block(lr[k-1],lc,m,n) = this->args[i]["A"];
 				lr[k-1] += m;
 				lc += n;
 				i++;
 			}
 		}
-		//std::cout << "A: " << A << "\n";
-		//std::cout << "matrix: " << rho*((Z-U+Z.transpose()-U.transpose())/2)-A << "\n";
 		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> decomp(rho*((Z-U+Z.transpose()-U.transpose())/2)-A);
 		Eigen::VectorXd lambda = decomp.eigenvalues();
 		for (int i = 0; i < lambda.rows(); ++i ){
@@ -141,6 +125,11 @@ public:
 				i++;
 			}
 		}
+	}
+
+	virtual void PrintNodeVariables(std::unordered_map<int,Eigen::MatrixXd> &node_x_vals)
+	{
+		std::cout << Theta << "\n";
 	}
 };
 #endif
