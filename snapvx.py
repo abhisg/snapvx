@@ -968,11 +968,12 @@ class TGraphVX(TUNGraph):
         self.node_variables[NId] = [(var.id,var.name(),var,0) \
                                     for var in sorted(proximalVariables,key=lambda t:t.name())]
         self.node_proximalArgs[NId] = []
-        for (_,_,var,_) in sorted(proximalVariables,key=lambda t:t.name()):
+        #for var in sorted(proximalVariables,key=lambda t:t.name()):
+        for var in proximalVariables:
             if var in proximalArgs:
                 self.node_proximalArgs[NId].append(proximalArgs[var])
             else:
-                self.node_proximalArgs[NId].append({})
+                self.node_proximalArgs[NId].append([])
         self.node_proximalOperator[NId] = proximalOperator
         return TUNGraph.AddNode(self,NId)
     
